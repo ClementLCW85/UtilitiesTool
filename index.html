@@ -53,9 +53,46 @@
                 
                 <div class="admin-panel">
                     <h3>Management Options</h3>
-                    <p>Select an action below (Pending Implementation in BILL-1 / PAY-1)</p>
+                    <form id="bill-form" class="admin-form">
+                        <fieldset>
+                            <legend>Record New Electric Bill</legend>
+                            <div class="form-group">
+                                <label for="bill-month">Month:</label>
+                                <select id="bill-month" required>
+                                    <option value="">--Select--</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-year">Year:</label>
+                                <input type="number" id="bill-year" min="2020" max="2100" required placeholder="e.g. 2024">
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-amount">Total Amount (RM):</label>
+                                <input type="number" id="bill-amount" min="0" step="0.01" required placeholder="e.g. 123.45">
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-date">Bill Issue Date:</label>
+                                <input type="date" id="bill-date" required>
+                            </div>
+                            <button type="submit">Save Bill</button>
+                            <span id="bill-form-status" class="small-note"></span>
+                        </fieldset>
+                    </form>
+                    <hr>
+                    <p>Select an action below (Pending Implementation in PAY-1)</p>
                     <div class="admin-actions">
-                        <button disabled>Record Bill</button>
                         <button disabled>Record Payment</button>
                     </div>
                 </div>
