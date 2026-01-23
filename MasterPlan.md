@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** DASH-1 (Dashboard Layout & Data Fetching)
-**Next Priority:** DASH-2 (Unit Bar Chart Component)
+**Active Task:** DASH-2 (Unit Bar Chart Component)
+**Next Priority:** DASH-3 (Global Break-Even Threshold Line)
 
 ## 📊 Progress Tracker
 
@@ -36,7 +36,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Implemented History Section with Unit Dropdown and Table in Admin UI.
 
 ### 4. Epic: Public Dashboard & Visualization
-- [ ] **DASH-1** Dashboard Layout & Data Fetching
+- [x] **DASH-1** Dashboard Layout & Data Fetching
+  - *Status:* Completed. Added Stats Grid to Dashboard fetching aggregated Bills and summing Unit Contributions.
 - [ ] **DASH-2** Unit Bar Chart Component
 - [ ] **DASH-3** Global Break-Even Threshold Line
 - [ ] **DASH-4** Highlighted Unit Status

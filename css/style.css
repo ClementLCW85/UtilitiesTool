@@ -143,3 +143,37 @@ th {
 .delete-btn:hover {
     background-color: #c82333;
 }
+
+/* Dashboard Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #0078d7;
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #888;
+}

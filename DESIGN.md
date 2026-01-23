@@ -90,3 +90,4 @@ Stores global aggregates.
 | **PAY-1** | **Record Payment** | Admin form to record owner payments affecting unit totals. | ✅ Available |
 | **PAY-2** | **Receipt Input** | Optional link field for payment proof in Admin Form. | ✅ Available |
 | **PAY-3** | **Payment History** | Admin view to filter and list payment records per Unit. | ✅ Available |
+| **DASH-1**| **Stats Overview** | Dashboard cards for Total Bills, Unit Target, and Total Collected. | ✅ Available |
