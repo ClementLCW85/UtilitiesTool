@@ -83,7 +83,8 @@ const SchemaService = {
         // index: 0 to 43
         const block = Math.floor(index / 11) + 1; // 1 to 4
         const unit = (index % 11) + 1; // 1 to 11
-        return `E-${block}0${unit}`;
+        const unitStr = unit < 10 ? `0${unit}` : `${unit}`;
+        return `E-${block}${unitStr}`;
     },
 
     // Seed the database with 44 empty units if they don't exist
@@ -107,13 +108,59 @@ const SchemaService = {
                 console.log("✅ Seeding Complete: 44 Units Created.");
                 alert("Database Initialized with 44 Units.");
             } else {
-                console.log("Database already contains units. Skipping seed.");
+                console.log("Database contains units. Checking for data integrity...");
+                await this.fixInvalidUnits(snapshot.docs);
             }
         } catch (error) {
             console.error("Init Error:", error);
-            if (error.code === 'permission-denied' || error.message.includes("Cloud Firestore API has not been used")) {
+            if (error && (error.code === 'permission-denied' || error.message.includes("Cloud Firestore API has not been used"))) {
                console.warn("API Not Enabled: Please enable Cloud Firestore in the Firebase Console and Create the Database.");
             }
+        }
+    },
+
+    // Migration helper to fix incorrectly formatted IDs (e.g. E-2010 -> E-210)
+    fixInvalidUnits: async function(existingDocs) {
+        if (!existingDocs || existingDocs.length === 0) return;
+        
+        const batch = window.db.batch();
+        let changesCount = 0;
+        const unitsRef = window.db.collection('units');
+        
+        // Map existing IDs for quick lookups
+        const existingIds = new Set(existingDocs.map(d => d.id));
+
+        for (let i = 0; i < 44; i++) {
+            const block = Math.floor(i / 11) + 1;
+            const unit = (i % 11) + 1;
+            
+            // Old Logic that produced errors
+            const wrongId = `E-${block}0${unit}`;
+            // New Correct Logic
+            const correctId = this.formatUnitId(i);
+
+            if (wrongId !== correctId && existingIds.has(wrongId)) {
+                // If the correct ID already exists, do nothing (avoid overwrite)
+                if (existingIds.has(correctId)) continue; 
+
+                console.log(`Migrating Data: ${wrongId} -> ${correctId}`);
+                
+                // Get data from wrong doc
+                const wrongDoc = existingDocs.find(d => d.id === wrongId);
+                const data = wrongDoc.data();
+                data.unitNumber = correctId; // Update internal field
+
+                // Schedule Create & Delete
+                batch.set(unitsRef.doc(correctId), data);
+                batch.delete(unitsRef.doc(wrongId));
+                changesCount++;
+            }
+        }
+
+        if (changesCount > 0) {
+            await batch.commit();
+            console.log(`✅ Fixed ${changesCount} invalid unit IDs.`);
+            alert(`System updated: Fixed ${changesCount} invalid unit IDs in the database.`);
         }
     }
 };
