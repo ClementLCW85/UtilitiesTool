@@ -121,10 +121,17 @@ function bindBillForm() {
 
         } catch (error) {
             console.error("Error saving bill:", error);
-            statusSpan.textContent = "Error: " + error.message;
+            
+            let displayError = error.message;
+            if (error.message.includes("Cloud Firestore API has not been used")) {
+               displayError = "API Disabled context: Please enable Firestore Database in the Firebase Console for this project.";
+               alert(displayError); // Alert is more visible for admin actions
+            }
+
+            statusSpan.textContent = "Error: " + displayError;
             statusSpan.style.color = "red";
-            submitBtn.textContent = originalBtnText; // Revert button text on error if needed, but logic above resets it to "Save Bill" usually. 
-            // Better to revert to "Save Bill" or "Update Bill" depending on state, but "Save Bill" is safe default after reset.
+            submitBtn.textContent = originalBtnText; 
+            // Better to revert to "Save Bill" or "Update Bill" depending on state
             if(editingBillId) submitBtn.textContent = "Update Bill";
             else submitBtn.textContent = "Save Bill";
         } finally {
@@ -150,7 +157,13 @@ async function fetchBills() {
     } catch (error) {
         console.error("Error fetching bills:", error);
         const tbody = document.querySelector('#bill-history-table tbody');
-        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:red">Error loading bills.</td></tr>`;
+        
+        let errorMsg = "Error loading bills.";
+        if (error.message.includes("Cloud Firestore API has not been used") || error.code === 'permission-denied') {
+            errorMsg = "API Error: Please enable Firestore in Firebase Console.";
+        }
+        
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:red">${errorMsg}</td></tr>`;
     }
 }
 
