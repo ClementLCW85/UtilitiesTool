@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** DASH-3 (Global Break-Even Threshold Line)
-**Next Priority:** DASH-4 (Highlighted Unit Status)
+**Active Task:** DASH-4 (Highlighted Unit Status)
+**Next Priority:** DASH-5 (Mobile Responsiveness)
 
 ## 📊 Progress Tracker
 
@@ -40,7 +40,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Added Stats Grid to Dashboard fetching aggregated Bills and summing Unit Contributions.
 - [x] **DASH-2** Unit Bar Chart Component
   - *Status:* Completed. Implemented responsive bar chart using Chart.js visualization of contribution per unit.
-- [ ] **DASH-3** Global Break-Even Threshold Line
+- [x] **DASH-3** Global Break-Even Threshold Line
+  - *Status:* Completed. Added horizontal line to Chart.js representing the target share per unit.
 - [ ] **DASH-4** Highlighted Unit Status
 - [ ] **DASH-5** Mobile Responsiveness
 
