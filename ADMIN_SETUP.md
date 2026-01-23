@@ -14,7 +14,7 @@ Since functionality to "Sign Up" is not exposed in the UI (to prevent unauthoriz
 
 1. Go to **Authentication** > **Users** tab.
 2. Click **Add user**.
-3. Enter Email: `admin@seapark.blocke.com`
+3. Enter Email: `wei91my@gmail.com`
    - *Note: This matches the hardcoded email in `js/auth.js`.*
 4. Enter Password: [Choose a Strong Password]
    - *This will be your "Master Password".*

@@ -1,7 +1,7 @@
 // Authentication Logic
 const auth = {
     // Admin Credential Configuration (Hardcoded Email for "Master Password" experience)
-    adminEmail: "admin@seapark.blocke.com", // Virtual email for the single admin account
+    adminEmail: "wei91my@gmail.com", // Virtual email for the single admin account
 
     init: function() {
         // Listen for auth state changes
@@ -71,5 +71,5 @@ const auth = {
     }
 };
 
-// Initialize usage with window load or external call
-// We'll let app.js call auth.init() or run it here if DOM is ready
+// Expose auth globally so app.js can initialize it
+window.auth = auth;
