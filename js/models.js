@@ -31,9 +31,9 @@ class Unit {
  */
 class Bill {
     constructor(month, year, amount, issueDate) {
-        this.id = `${year}-${month}`; // Unique ID: "2023-11"
-        this.month = month; // 1-12
-        this.year = year; // 2023
+        this.month = Number(month); // Ensure Number for correct sorting
+        this.year = Number(year);   // Ensure Number for correct sorting
+        this.id = `${this.year}-${this.month}`; // Unique ID: "2023-11"
         this.amount = Number(amount);
         this.issueDate = issueDate; // String YYYY-MM-DD or Timestamp
         this.createdAt = new Date();
