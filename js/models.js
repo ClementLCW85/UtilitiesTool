@@ -88,25 +88,32 @@ const SchemaService = {
 
     // Seed the database with 44 empty units if they don't exist
     initUnits: async function() {
-        const unitsRef = window.db.collection('units');
-        const snapshot = await unitsRef.get();
+        try {
+            const unitsRef = window.db.collection('units');
+            const snapshot = await unitsRef.get();
 
-        if (snapshot.empty) {
-            console.log("Seeding Database with 44 Units...");
-            const batch = window.db.batch();
+            if (snapshot.empty) {
+                console.log("Seeding Database with 44 Units...");
+                const batch = window.db.batch();
 
-            for (let i = 0; i < 44; i++) {
-                const unitId = this.formatUnitId(i);
-                const newUnit = new Unit(unitId, `Owner ${unitId}`);
-                const docRef = unitsRef.doc(unitId);
-                batch.set(docRef, newUnit.toFirestore());
+                for (let i = 0; i < 44; i++) {
+                    const unitId = this.formatUnitId(i);
+                    const newUnit = new Unit(unitId, `Owner ${unitId}`);
+                    const docRef = unitsRef.doc(unitId);
+                    batch.set(docRef, newUnit.toFirestore());
+                }
+
+                await batch.commit();
+                console.log("✅ Seeding Complete: 44 Units Created.");
+                alert("Database Initialized with 44 Units.");
+            } else {
+                console.log("Database already contains units. Skipping seed.");
             }
-
-            await batch.commit();
-            console.log("✅ Seeding Complete: 44 Units Created.");
-            alert("Database Initialized with 44 Units.");
-        } else {
-            console.log("Database already contains units. Skipping seed.");
+        } catch (error) {
+            console.error("Init Error:", error);
+            if (error.code === 'permission-denied' || error.message.includes("Cloud Firestore API has not been used")) {
+               console.warn("API Not Enabled: Please enable Cloud Firestore in the Firebase Console and Create the Database.");
+            }
         }
     }
 };
