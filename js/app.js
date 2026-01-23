@@ -186,6 +186,7 @@ function bindPaymentForm() {
         const amount = parseFloat(document.getElementById('payment-amount').value);
         const date = document.getElementById('payment-date').value;
         const reference = document.getElementById('payment-ref').value;
+        const receiptUrl = document.getElementById('payment-receipt').value;
 
         try {
             if (!unitNumber || !amount || !date) {
@@ -193,7 +194,7 @@ function bindPaymentForm() {
             }
 
             // Create Payment Object
-            const payment = new window.Models.Payment(unitNumber, amount, date, reference);
+            const payment = new window.Models.Payment(unitNumber, amount, date, reference, receiptUrl);
 
             // Using Batch to ensure atomic update of Payment Record AND Unit Total
             const batch = window.db.batch();

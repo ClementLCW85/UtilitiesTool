@@ -88,3 +88,4 @@ Stores global aggregates.
 | **BILL-2** | **Bill History** | View, Edit, and Delete historical bill records. | ✅ Available |
 | **BILL-3** | **Auto-Calc Stats** | Automatic calculation of Global Break-even & Per-Unit Target. | ✅ Available |
 | **PAY-1** | **Record Payment** | Admin form to record owner payments affecting unit totals. | ✅ Available |
+| **PAY-2** | **Receipt Input** | Optional link field for payment proof in Admin Form. | ✅ Available |
