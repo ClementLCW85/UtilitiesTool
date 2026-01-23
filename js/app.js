@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Bill Form Logic
     bindBillForm();
 
+    // Bind Payment Form Logic
+    bindPaymentForm();
+    
+    // Populate UnitsDropdown
+    populateUnitDropdown();
+
     // Bind Bill History Table Events
     bindBillHistoryEvents();
 
@@ -50,6 +56,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Global variable to track editing state
 let editingBillId = null;
+
+function populateUnitDropdown() {
+    const select = document.getElementById('payment-unit');
+    if (!select) return;
+
+    // Clear existing options except first
+    select.innerHTML = '<option value="">--Select Unit--</option>';
+
+    // We know there are 44 units, E-101 to E-411.
+    // We can generate them algorithmically or fetch from DB. 
+    // Fetching from DB handles sorting and validity better if we needed dynamic lists.
+    // For now, generating ensures immediate availability without async wait on load, 
+    // but ideally we should wait for DB. Let's start with static generation to match Models.js logic.
+    
+    for (let i = 0; i < 44; i++) {
+         const id = window.Models.SchemaService.formatUnitId(i);
+         const option = document.createElement('option');
+         option.value = id;
+         option.textContent = id;
+         select.appendChild(option);
+    }
+}
 
 function handleNavigation() {
     const hash = window.location.hash || '#dashboard';
@@ -136,6 +164,61 @@ function bindBillForm() {
             // Better to revert to "Save Bill" or "Update Bill" depending on state
             if(editingBillId) submitBtn.textContent = "Update Bill";
             else submitBtn.textContent = "Save Bill";
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+function bindPaymentForm() {
+    const paymentForm = document.getElementById('payment-form');
+    if (!paymentForm) return;
+
+    paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = paymentForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        const statusSpan = document.getElementById('payment-form-status');
+        statusSpan.textContent = "Processing Payment...";
+        statusSpan.style.color = "blue";
+
+        const unitNumber = document.getElementById('payment-unit').value;
+        const amount = parseFloat(document.getElementById('payment-amount').value);
+        const date = document.getElementById('payment-date').value;
+        const reference = document.getElementById('payment-ref').value;
+
+        try {
+            if (!unitNumber || !amount || !date) {
+                throw new Error("Please fill in all required fields.");
+            }
+
+            // Create Payment Object
+            const payment = new window.Models.Payment(unitNumber, amount, date, reference);
+
+            // Using Batch to ensure atomic update of Payment Record AND Unit Total
+            const batch = window.db.batch();
+
+            // 1. New Payment Document (Auto-ID)
+            const paymentRef = window.db.collection('payments').doc();
+            batch.set(paymentRef, payment.toFirestore());
+
+            // 2. Update Unit Total Contributed
+            const unitRef = window.db.collection('units').doc(unitNumber);
+            // We need to use Firestore Increment for safety
+            batch.update(unitRef, {
+                totalContributed: firebase.firestore.FieldValue.increment(amount)
+            });
+
+            await batch.commit();
+
+            statusSpan.textContent = `Payment of RM${amount.toFixed(2)} for ${unitNumber} recorded!`;
+            statusSpan.style.color = "green";
+            paymentForm.reset();
+
+        } catch (error) {
+            console.error("Error saving payment:", error);
+            statusSpan.textContent = "Error: " + error.message;
+            statusSpan.style.color = "red";
         } finally {
             submitBtn.disabled = false;
         }
