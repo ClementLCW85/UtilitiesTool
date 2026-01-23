@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** BILL-2 (Bill History View)
-**Next Priority:** BILL-3 (Auto-Calculate Global Break-Even)
+**Active Task:** PAY-1 (Record Unit Payment)
+**Next Priority:** PAY-2 (Receipt Link Input)
 
 ## 📊 Progress Tracker
 
@@ -24,7 +24,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Admin Form created and connected to Firestore `bills` collection.
 - [x] **BILL-2** Bill History View
   - *Status:* Completed. Implemented Bill History Table with Edit/Delete functionality in Admin Dashboard.
-- [ ] **BILL-3** Auto-Calculate Global Break-Even
+- [x] **BILL-3** Auto-Calculate Global Break-Even
+  - *Status:* Completed. Implemented automatic recalculation of total bills amount and per-unit target to `system/stats` on every bill change.
 
 ### 3. Epic: Owner Payment Management (Admin)
 - [ ] **PAY-1** Record Unit Payment

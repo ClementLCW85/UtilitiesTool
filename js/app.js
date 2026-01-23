@@ -118,6 +118,7 @@ function bindBillForm() {
 
             // Trigger auto-calculate break-even (BILL-3 future implementation hook)
             console.log("Bill Saved. Triggering global calculation...");
+            await calculateGlobalBreakEven();
 
         } catch (error) {
             console.error("Error saving bill:", error);
@@ -225,6 +226,10 @@ async function handleDeleteBill(id) {
         await window.db.collection('bills').doc(id).delete();
         // Refresh list
         fetchBills();
+        
+        // Trigger auto-calculate break-even
+        calculateGlobalBreakEven();
+
         // Show status
         const statusSpan = document.getElementById('bill-history-status');
         if(statusSpan) {
@@ -272,4 +277,33 @@ async function handleEditBill(id) {
          console.error("Error loading bill for edit:", error);
          alert("Error loading bill.");
      }
+}
+
+// BILL-3: Global Break-Even Calculation
+async function calculateGlobalBreakEven() {
+    console.log("Starting Global Break-Even Calculation...");
+    try {
+        const snapshot = await window.db.collection('bills').get();
+        let totalAmount = 0;
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            totalAmount += (Number(data.amount) || 0);
+        });
+
+        const globalStats = {
+            totalBillsAmount: totalAmount,
+            unitTarget: totalAmount / 44, // 44 Units
+            lastUpdated: new Date()
+        };
+
+        // Save to 'system/stats'
+        await window.db.collection('system').doc('stats').set(globalStats);
+        
+        console.log("Global Break-Even Updated:", globalStats);
+        return globalStats;
+        
+    } catch (error) {
+        console.error("Error calculating global break-even:", error);
+    }
 }
