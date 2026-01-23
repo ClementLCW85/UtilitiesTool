@@ -18,11 +18,47 @@
     </header>
 
     <main id="app">
-        <section id="dashboard">
+        <!-- Public Dashboard Section -->
+        <section id="dashboard" class="view-section">
             <h2>Public Dashboard</h2>
             <div id="chart-container">
                 <!-- Chart will be rendered here -->
                 <p>Loading data...</p>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin" class="view-section" style="display:none;">
+            <h2>Admin Interface</h2>
+            
+            <!-- Login State -->
+            <div id="admin-login">
+                <h3>Restricted Access</h3>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="admin-password">Master Password:</label>
+                        <input type="password" id="admin-password" required placeholder="Enter Admin Password">
+                    </div>
+                    <button type="submit">Login</button>
+                    <p class="small-note">Note: Uses Firebase Auth (admin@seapark.blocke.com)</p>
+                </form>
+            </div>
+
+            <!-- Authenticated State -->
+            <div id="admin-content" style="display:none;">
+                <div class="admin-header">
+                    <span>Welcome, Admin</span>
+                    <button id="logout-btn">Logout</button>
+                </div>
+                
+                <div class="admin-panel">
+                    <h3>Management Options</h3>
+                    <p>Select an action below (Pending Implementation in BILL-1 / PAY-1)</p>
+                    <div class="admin-actions">
+                        <button disabled>Record Bill</button>
+                        <button disabled>Record Payment</button>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -31,6 +67,16 @@
         <p>&copy; Seapark Block E Management</p>
     </footer>
 
+    <!-- Firebase SDKs (using version 10.7.1 compat for simpler script tag usage without bundlers, or standard modular via module scripts) -->
+    <!-- Utilizing the numbered version to ensure stability. Using compat libraries for easier standalone script usage without a build step. -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
