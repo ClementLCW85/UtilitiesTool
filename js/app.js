@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Auth Module (window.auth) not found. Check js/auth.js loading.");
     }
 
+    // Check for Unit initialization (One-time check for development/first run)
+    // In production, this might be triggered manually by Admin
+    if (window.Models && window.Models.SchemaService) {
+        // Auto-check on load (Safe because it checks if valid non-empty collection exists first)
+        window.Models.SchemaService.initUnits().catch(err => console.error("Init Error:", err));
+    }
+
     // Navigation Logic
     handleNavigation();
     window.addEventListener('hashchange', handleNavigation);
