@@ -29,7 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Bind Bill Form Logic
     bindBillForm();
+
+    // Bind Bill History Table Events
+    bindBillHistoryEvents();
+
+    // Listen for Auth to fetch data
+    if (window.firebase) {
+        window.firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                fetchBills();
+            } else {
+                // Clear table on logout
+                const tbody = document.querySelector('#bill-history-table tbody');
+                if (tbody) tbody.innerHTML = '';
+            }
+        });
+    }
 });
+
+// Global variable to track editing state
+let editingBillId = null;
 
 function handleNavigation() {
     const hash = window.location.hash || '#dashboard';
@@ -51,6 +70,11 @@ function bindBillForm() {
 
     billForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const submitBtn = billForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing...";
+
         const statusSpan = document.getElementById('bill-form-status');
         statusSpan.textContent = "Saving...";
         statusSpan.style.color = "blue";
@@ -70,6 +94,12 @@ function bindBillForm() {
             // Create Bill Object
             const bill = new window.Models.Bill(month, year, amount, issueDate);
             
+            // Check if we are updating an existing entry that changed its ID (month/year changed)
+            if (editingBillId && editingBillId !== bill.id) {
+                 // Delete the old record
+                 await window.db.collection('bills').doc(editingBillId).delete();
+            }
+
             // Save to Firestore
             // Use set with merge:true or just set() since ID is deterministic (yyyy-mm)
             await window.db.collection('bills').doc(bill.id).set(bill.toFirestore());
@@ -79,6 +109,13 @@ function bindBillForm() {
             statusSpan.style.color = "green";
             billForm.reset();
             
+            // Reset Edit State
+            editingBillId = null;
+            submitBtn.textContent = "Save Bill"; 
+            
+            // Refresh Bill List
+            fetchBills();
+
             // Trigger auto-calculate break-even (BILL-3 future implementation hook)
             console.log("Bill Saved. Triggering global calculation...");
 
@@ -86,6 +123,138 @@ function bindBillForm() {
             console.error("Error saving bill:", error);
             statusSpan.textContent = "Error: " + error.message;
             statusSpan.style.color = "red";
+            submitBtn.textContent = originalBtnText; // Revert button text on error if needed, but logic above resets it to "Save Bill" usually. 
+            // Better to revert to "Save Bill" or "Update Bill" depending on state, but "Save Bill" is safe default after reset.
+            if(editingBillId) submitBtn.textContent = "Update Bill";
+            else submitBtn.textContent = "Save Bill";
+        } finally {
+            submitBtn.disabled = false;
         }
     });
+}
+
+// Fetch and Display Bills
+async function fetchBills() {
+    try {
+        const snapshot = await window.db.collection('bills')
+            .orderBy('year', 'desc')
+            .orderBy('month', 'desc')
+            .get();
+            
+        const bills = [];
+        snapshot.forEach(doc => {
+            bills.push({ id: doc.id, ...doc.data() });
+        });
+        
+        renderBillTable(bills);
+    } catch (error) {
+        console.error("Error fetching bills:", error);
+        const tbody = document.querySelector('#bill-history-table tbody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:red">Error loading bills.</td></tr>`;
+    }
+}
+
+function renderBillTable(bills) {
+    const tbody = document.querySelector('#bill-history-table tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+
+    if (bills.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No bills recorded yet.</td></tr>';
+        return;
+    }
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    bills.forEach(bill => {
+        const tr = document.createElement('tr');
+        const monthName = monthNames[parseInt(bill.month) - 1] || bill.month;
+        
+        tr.innerHTML = `
+            <td>${monthName}</td>
+            <td>${bill.year}</td>
+            <td>${parseFloat(bill.amount).toFixed(2)}</td>
+            <td>${bill.issueDate}</td>
+            <td>
+                <button class="action-btn edit-btn" data-id="${bill.id}">Edit</button>
+                <button class="action-btn delete-btn" data-id="${bill.id}">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function bindBillHistoryEvents() {
+    const table = document.getElementById('bill-history-table');
+    if (!table) return;
+
+    table.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+            const id = e.target.dataset.id;
+            await handleDeleteBill(id);
+        }
+        if (e.target.classList.contains('edit-btn')) {
+            const id = e.target.dataset.id;
+            handleEditBill(id);
+        }
+    });
+}
+
+async function handleDeleteBill(id) {
+    if (!confirm("Are you sure you want to delete this bill?")) return;
+    
+    try {
+        await window.db.collection('bills').doc(id).delete();
+        // Refresh list
+        fetchBills();
+        // Show status
+        const statusSpan = document.getElementById('bill-history-status');
+        if(statusSpan) {
+            statusSpan.textContent = "Bill deleted.";
+            statusSpan.style.color = "green";
+            setTimeout(() => statusSpan.textContent = "", 3000);
+        }
+    } catch (error) {
+        console.error("Error deleting bill:", error);
+        alert("Failed to delete bill: " + error.message);
+    }
+}
+
+async function handleEditBill(id) {
+     try {
+        const doc = await window.db.collection('bills').doc(id).get();
+        if (!doc.exists) {
+            alert("Bill not found!");
+            return;
+        }
+        const data = doc.data();
+        
+        // Populate inputs
+        document.getElementById('bill-month').value = data.month;
+        document.getElementById('bill-year').value = data.year;
+        document.getElementById('bill-amount').value = data.amount;
+        document.getElementById('bill-date').value = data.issueDate;
+        
+        // Scroll to form
+        const form = document.getElementById('bill-form');
+        form.scrollIntoView({ behavior: 'smooth' });
+        
+        // Set Global Edit State
+        editingBillId = id;
+
+        // Update Button Text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.textContent = "Update Bill";
+
+        const statusSpan = document.getElementById('bill-form-status');
+        statusSpan.textContent = "Editing Bill " + id + ". Adjust details and Save.";
+        statusSpan.style.color = "blue";
+        
+     } catch (error) {
+         console.error("Error loading bill for edit:", error);
+         alert("Error loading bill.");
+     }
 }
