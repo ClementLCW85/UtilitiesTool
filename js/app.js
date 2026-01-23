@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Global variable to track editing state
 let editingBillId = null;
+let unitChartInstance = null; // Track Chart.js instance
 
 function populateUnitDropdown() {
     const targets = ['payment-unit', 'history-unit-select'];
@@ -114,12 +115,19 @@ async function loadDashboardData() {
         // 2. Fetch All Units (Total Collected)
         const unitsSnapshot = await window.db.collection('units').get();
         let totalCollected = 0;
+        const unitsData = [];
+
         unitsSnapshot.forEach(doc => {
-            totalCollected += (doc.data().totalContributed || 0);
+            const data = doc.data();
+            totalCollected += (data.totalContributed || 0);
+            unitsData.push(data);
         });
 
         // 3. Render Stats
         updateDashboardStats(stats.totalBillsAmount, stats.unitTarget, totalCollected);
+
+        // 4. Render Chart
+        renderUnitBarChart(unitsData);
 
     } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -141,6 +149,57 @@ function updateDashboardStats(totalBills, unitTarget, totalCollected) {
         statusEl.textContent = `RM ${diff.toFixed(2)}`;
         statusEl.style.color = diff >= 0 ? 'green' : 'red';
     }
+}
+
+function renderUnitBarChart(units) {
+    const ctx = document.getElementById('unit-bar-chart');
+    if(!ctx) return;
+    
+    // Sort units by ID (E-101 .. E-411)
+    units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
+
+    const labels = units.map(u => u.unitNumber);
+    const data = units.map(u => u.totalContributed);
+    
+    // Destroy previous chart if exists to avoid "Canvas is already in use" error
+    if (unitChartInstance) {
+        unitChartInstance.destroy();
+    }
+    
+    unitChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Contributed (RM)',
+                data: data,
+                backgroundColor: '#0078d7',
+                borderColor: '#005a9e',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount (RM)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
+    const loadingMsg = document.getElementById('chart-loading-msg');
+    if(loadingMsg) loadingMsg.style.display = 'none';
 }
 
 function bindBillForm() {
