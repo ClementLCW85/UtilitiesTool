@@ -78,9 +78,12 @@ class Payment {
 
 // Service to help with Data Management
 const SchemaService = {
-    // Generate standard Unit ID string (e.g., 1 -> "E-01")
-    formatUnitId: function(num) {
-        return `E-${String(num).padStart(2, '0')}`;
+    // Generate standard Unit ID string (E-101 to E-111, E-201 to E-211, etc.)
+    formatUnitId: function(index) {
+        // index: 0 to 43
+        const block = Math.floor(index / 11) + 1; // 1 to 4
+        const unit = (index % 11) + 1; // 1 to 11
+        return `E-${block}0${unit}`;
     },
 
     // Seed the database with 44 empty units if they don't exist
@@ -92,7 +95,7 @@ const SchemaService = {
             console.log("Seeding Database with 44 Units...");
             const batch = window.db.batch();
 
-            for (let i = 1; i <= 44; i++) {
+            for (let i = 0; i < 44; i++) {
                 const unitId = this.formatUnitId(i);
                 const newUnit = new Unit(unitId, `Owner ${unitId}`);
                 const docRef = unitsRef.doc(unitId);

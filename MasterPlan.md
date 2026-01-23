@@ -5,7 +5,7 @@ Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
 **Active Task:** None
-**Next Priority:** BILL-1 (Record New Bill)
+**Next Priority:** BILL-2 (Bill History View)
 
 ## 📊 Progress Tracker
 
@@ -20,7 +20,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. `js/models.js` created with Unit, Bill, Payment classes. DB seeded with 44 Units.
 
 ### 2. Epic: Monthly Bill Management (Admin)
-- [ ] **BILL-1** Record New Bill
+- [x] **BILL-1** Record New Bill
+  - *Status:* Completed. Admin Form created and connected to Firestore `bills` collection.
 - [ ] **BILL-2** Bill History View
 - [ ] **BILL-3** Auto-Calculate Global Break-Even
 
