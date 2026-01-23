@@ -109,10 +109,38 @@
                         </table>
                         <span id="bill-history-status" class="small-note"></span>
                     </section>
-                    <p>Select an action below (Pending Implementation in PAY-1)</p>
-                    <div class="admin-actions">
+                    <p id="payment-placeholder" style="display:none;">Select an action below (Pending Implementation in PAY-1)</p>
+                    <div class="admin-actions" style="display:none;">
                         <button disabled>Record Payment</button>
                     </div>
+
+                    <form id="payment-form" class="admin-form">
+                        <fieldset>
+                            <legend>Record Unit Payment</legend>
+                            <div class="form-group">
+                                <label for="payment-unit">Unit Number:</label>
+                                <select id="payment-unit" required>
+                                    <option value="">--Select Unit--</option>
+                                    <!-- Options will be populated by JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-amount">Amount (RM):</label>
+                                <input type="number" id="payment-amount" min="0" step="0.01" required placeholder="e.g. 50.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-date">Date:</label>
+                                <input type="date" id="payment-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-ref">Reference/Note (Optional):</label>
+                                <input type="text" id="payment-ref" placeholder="e.g. Oct Contribution">
+                            </div>
+                             <!-- Receipt link place holder for PAY-2 -->
+                            <button type="submit">Record Payment</button>
+                            <span id="payment-form-status" class="small-note"></span>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         </section>

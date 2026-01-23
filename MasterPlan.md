@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** PAY-1 (Record Unit Payment)
-**Next Priority:** PAY-2 (Receipt Link Input)
+**Active Task:** PAY-2 (Receipt Link Input)
+**Next Priority:** PAY-3 (Payment History per Unit)
 
 ## 📊 Progress Tracker
 
@@ -28,7 +28,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Implemented automatic recalculation of total bills amount and per-unit target to `system/stats` on every bill change.
 
 ### 3. Epic: Owner Payment Management (Admin)
-- [ ] **PAY-1** Record Unit Payment
+- [x] **PAY-1** Record Unit Payment
+  - *Status:* Completed. Implemented Payment Form in Admin UI with Unit selection and amount input. Payments increment Unit totals atomically.
 - [ ] **PAY-2** Receipt Link Input
 - [ ] **PAY-3** Payment History per Unit
 
