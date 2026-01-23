@@ -127,7 +127,7 @@ async function loadDashboardData() {
         updateDashboardStats(stats.totalBillsAmount, stats.unitTarget, totalCollected);
 
         // 4. Render Chart
-        renderUnitBarChart(unitsData);
+        renderUnitBarChart(unitsData, stats.unitTarget);
 
     } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -151,21 +151,28 @@ function updateDashboardStats(totalBills, unitTarget, totalCollected) {
     }
 }
 
-function renderUnitBarChart(units) {
-    const ctx = document.getElementById('unit-bar-chart');
-    if(!ctx) return;
+function renderUnitBarChart(units, targetValue = 0) {
+console.log("Rendering Unit Bar Chart...", units ? units.length : 0, "units found.");
+const ctx = document.getElementById('unit-bar-chart');
+if(!ctx) {
+    console.error("Canvas element #unit-bar-chart not found in DOM.");
+    return;
+}
     
-    // Sort units by ID (E-101 .. E-411)
-    units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
+// Sort units by ID (E-101 .. E-411)
+units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
 
-    const labels = units.map(u => u.unitNumber);
-    const data = units.map(u => u.totalContributed);
+const labels = units.map(u => u.unitNumber);
+const data = units.map(u => u.totalContributed);
+const targetData = new Array(units.length).fill(targetValue);
     
-    // Destroy previous chart if exists to avoid "Canvas is already in use" error
-    if (unitChartInstance) {
-        unitChartInstance.destroy();
-    }
+// Destroy previous chart if exists to avoid "Canvas is already in use" error
+if (unitChartInstance) {
+    console.log("Destroying existing chart instance.");
+    unitChartInstance.destroy();
+}
     
+try {
     unitChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -175,28 +182,44 @@ function renderUnitBarChart(units) {
                 data: data,
                 backgroundColor: '#0078d7',
                 borderColor: '#005a9e',
-                borderWidth: 1
+                borderWidth: 1,
+                order: 2
+            },
+            {
+                type: 'line',
+                label: 'Target Break-Even (RM)',
+                data: targetData,
+                borderColor: '#ff0000',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false,
+                order: 1
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Amount (RM)'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount (RM)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
                     }
                 }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
             }
-        }
-    });
+        });
+        console.log("Chart rendered successfully.");
+    } catch (e) {
+        console.error("Error creating Chart.js instance:", e);
+    }
 
     const loadingMsg = document.getElementById('chart-loading-msg');
     if(loadingMsg) loadingMsg.style.display = 'none';

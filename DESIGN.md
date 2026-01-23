@@ -92,3 +92,4 @@ Stores global aggregates.
 | **PAY-3** | **Payment History** | Admin view to filter and list payment records per Unit. | ✅ Available |
 | **DASH-1**| **Stats Overview** | Dashboard cards for Total Bills, Unit Target, and Total Collected. | ✅ Available |
 | **DASH-2**| **Unit Bar Chart** | Bar chart visualization of contributions per unit (1-44). | ✅ Available |
+| **DASH-3**| **Threshold Line** | Visual target break-even line on the unit bar chart. | ✅ Available |
