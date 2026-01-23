@@ -181,7 +181,19 @@ th {
 /* Chart Container */
 #chart-container {
     position: relative;
-    height: 400px;
     width: 100%;
     margin-top: 2rem;
+    background: #fff;
+    padding-bottom: 10px;
+}
+
+.chart-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* For smooth mobile scrolling */
+}
+
+#unit-bar-chart {
+    min-width: 1200px; /* Ensure space for 44 units */
+    height: 400px !important;
 }

@@ -201,6 +201,13 @@ try {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 90,
+                            minRotation: 45
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         title: {
