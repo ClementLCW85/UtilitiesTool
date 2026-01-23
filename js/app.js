@@ -161,6 +161,8 @@ async function fetchBills() {
         let errorMsg = "Error loading bills.";
         if (error.message.includes("Cloud Firestore API has not been used") || error.code === 'permission-denied') {
             errorMsg = "API Error: Please enable Firestore in Firebase Console.";
+        } else if (error.message.includes("requires an index") || error.code === 'failed-precondition') {
+            errorMsg = "Index Missing: Open Developer Console (F12) and click the Firebase link to create the index.";
         }
         
         if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:red">${errorMsg}</td></tr>`;
