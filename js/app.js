@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     handleNavigation();
     window.addEventListener('hashchange', handleNavigation);
 
+    // Initial Dashboard Load
+    if (!window.location.hash || window.location.hash === '#dashboard') {
+        loadDashboardData();
+    }
+
     // Bind Bill Form Logic
     bindBillForm();
 
@@ -92,6 +97,50 @@ function handleNavigation() {
     });
 
     console.log("Navigated to:", hash);
+    
+    // Refresh Dashboard Data if active
+    if (hash === '#dashboard') {
+        loadDashboardData();
+    }
+}
+
+async function loadDashboardData() {
+    console.log("Loading Dashboard Data...");
+    try {
+        // 1. Fetch Global Stats (Total Bills)
+        const statsDoc = await window.db.collection('system').doc('stats').get();
+        const stats = statsDoc.exists ? statsDoc.data() : { totalBillsAmount: 0, unitTarget: 0 };
+        
+        // 2. Fetch All Units (Total Collected)
+        const unitsSnapshot = await window.db.collection('units').get();
+        let totalCollected = 0;
+        unitsSnapshot.forEach(doc => {
+            totalCollected += (doc.data().totalContributed || 0);
+        });
+
+        // 3. Render Stats
+        updateDashboardStats(stats.totalBillsAmount, stats.unitTarget, totalCollected);
+
+    } catch (error) {
+        console.error("Error loading dashboard data:", error);
+    }
+}
+
+function updateDashboardStats(totalBills, unitTarget, totalCollected) {
+    const totalBillsEl = document.getElementById('stat-total-bills');
+    const unitTargetEl = document.getElementById('stat-unit-target');
+    const totalCollectedEl = document.getElementById('stat-total-collected');
+    const statusEl = document.getElementById('stat-status');
+
+    if(totalBillsEl) totalBillsEl.textContent = `RM ${totalBills.toFixed(2)}`;
+    if(unitTargetEl) unitTargetEl.textContent = `RM ${unitTarget.toFixed(2)}`;
+    if(totalCollectedEl) totalCollectedEl.textContent = `RM ${totalCollected.toFixed(2)}`;
+
+    const diff = totalCollected - totalBills;
+    if(statusEl) {
+        statusEl.textContent = `RM ${diff.toFixed(2)}`;
+        statusEl.style.color = diff >= 0 ? 'green' : 'red';
+    }
 }
 
 function bindBillForm() {
