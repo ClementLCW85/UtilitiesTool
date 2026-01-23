@@ -1,14 +1,17 @@
 // Firebase Configuration
 // TODO: Replace with your actual Firebase project configuration
 // You can get this from the Firebase Console > Project Settings > General > Your Apps > SDK Setup and Configuration
+
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCI4SXFX9b8KMcoJPF6mwdvQfWL_Kbjn9w",
+    authDomain: "seaparkapartmentblocke.firebaseapp.com",
+    projectId: "seaparkapartmentblocke",
+    storageBucket: "seaparkapartmentblocke.firebasestorage.app",
+    messagingSenderId: "182471854682",
+    appId: "1:182471854682:web:80880b743920d210d3a663",
+    measurementId: "G-G78Z21PH3M"
 };
+
 
 // Export config for use in other modules
 // Note: In a real module system we would use 'export', but for simple browser inclusion we'll stick to global or window scope 
