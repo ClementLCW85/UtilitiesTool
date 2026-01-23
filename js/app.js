@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Auth Module
     if (window.auth) {
         window.auth.init();
+        console.log("Auth Module Initialized");
+    } else {
+        console.error("Auth Module (window.auth) not found. Check js/auth.js loading.");
     }
 
     // Navigation Logic
