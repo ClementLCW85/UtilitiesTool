@@ -89,3 +89,4 @@ Stores global aggregates.
 | **BILL-3** | **Auto-Calc Stats** | Automatic calculation of Global Break-even & Per-Unit Target. | ✅ Available |
 | **PAY-1** | **Record Payment** | Admin form to record owner payments affecting unit totals. | ✅ Available |
 | **PAY-2** | **Receipt Input** | Optional link field for payment proof in Admin Form. | ✅ Available |
+| **PAY-3** | **Payment History** | Admin view to filter and list payment records per Unit. | ✅ Available |

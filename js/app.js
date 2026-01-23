@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Bill History Table Events
     bindBillHistoryEvents();
 
+    // Bind Payment History Logic
+    bindPaymentHistoryEvents();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -58,25 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
 let editingBillId = null;
 
 function populateUnitDropdown() {
-    const select = document.getElementById('payment-unit');
-    if (!select) return;
-
-    // Clear existing options except first
-    select.innerHTML = '<option value="">--Select Unit--</option>';
-
-    // We know there are 44 units, E-101 to E-411.
-    // We can generate them algorithmically or fetch from DB. 
-    // Fetching from DB handles sorting and validity better if we needed dynamic lists.
-    // For now, generating ensures immediate availability without async wait on load, 
-    // but ideally we should wait for DB. Let's start with static generation to match Models.js logic.
+    const targets = ['payment-unit', 'history-unit-select'];
     
-    for (let i = 0; i < 44; i++) {
-         const id = window.Models.SchemaService.formatUnitId(i);
-         const option = document.createElement('option');
-         option.value = id;
-         option.textContent = id;
-         select.appendChild(option);
-    }
+    targets.forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) return;
+
+        // Clear existing options except first
+        select.innerHTML = '<option value="">--Select Unit--</option>';
+        
+        for (let i = 0; i < 44; i++) {
+             const unitId = window.Models.SchemaService.formatUnitId(i);
+             const option = document.createElement('option');
+             option.value = unitId;
+             option.textContent = unitId;
+             select.appendChild(option);
+        }
+    });
 }
 
 function handleNavigation() {
@@ -390,5 +391,63 @@ async function calculateGlobalBreakEven() {
         
     } catch (error) {
         console.error("Error calculating global break-even:", error);
+    }
+}
+
+function bindPaymentHistoryEvents() {
+    const select = document.getElementById('history-unit-select');
+    if (!select) return;
+
+    select.addEventListener('change', (e) => {
+        const unitId = e.target.value;
+        if (unitId) {
+            fetchPaymentHistory(unitId);
+        } else {
+            document.querySelector('#payment-history-table tbody').innerHTML = 
+                '<tr><td colspan="4">Select a unit to view history.</td></tr>';
+        }
+    });
+}
+
+async function fetchPaymentHistory(unitId) {
+    const tbody = document.querySelector('#payment-history-table tbody');
+    tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+
+    try {
+        // Query payments for the unit
+        // Note: Ordering by date might require a composite index (unitNumber + date).
+        // To keep it simple and avoid index creation blocks, we fetch by unit and sort client-side.
+        const snapshot = await window.db.collection('payments')
+            .where('unitNumber', '==', unitId)
+            .get();
+
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="4">No payments recorded for this unit.</td></tr>';
+            return;
+        }
+
+        const payments = [];
+        snapshot.forEach(doc => payments.push(doc.data()));
+        
+        // Sort descending by date
+        payments.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        tbody.innerHTML = '';
+        payments.forEach(p => {
+             const row = document.createElement('tr');
+             const receiptLink = p.receiptUrl ? `<a href="${p.receiptUrl}" target="_blank">View</a>` : '-';
+             
+             row.innerHTML = `
+                <td>${p.date}</td>
+                <td>${p.amount.toFixed(2)}</td>
+                <td>${p.reference || '-'}</td>
+                <td>${receiptLink}</td>
+             `;
+             tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error fetching payment history:", error);
+        tbody.innerHTML = `<tr><td colspan="4" style="color:red">Error: ${error.message}</td></tr>`;
     }
 }
