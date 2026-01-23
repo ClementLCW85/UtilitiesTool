@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Seapark Utility Tracker App Initialized');
+    console.log('App Version: 1.1 - BILL-3 Calc Enabled'); // Version check
 
     // Simple test to check if DB is accessible (Client side check)
     if (window.db) {
@@ -114,7 +115,7 @@ function bindBillForm() {
             submitBtn.textContent = "Save Bill"; 
             
             // Refresh Bill List
-            fetchBills();
+            await fetchBills();
 
             // Trigger auto-calculate break-even (BILL-3 future implementation hook)
             console.log("Bill Saved. Triggering global calculation...");
