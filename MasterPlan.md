@@ -5,7 +5,7 @@ Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
 **Active Task:** None
-**Next Priority:** INF-4 (Define Data Models)
+**Next Priority:** BILL-1 (Record New Bill)
 
 ## 📊 Progress Tracker
 
@@ -16,7 +16,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Firebase SDK Integration added. `js/config.js` created for user credentials.
 - [x] **INF-3** Admin Authentication
   - *Status:* Completed. Implemented via Firebase Auth (Email/Password) with a hardcoded admin email.
-- [ ] **INF-4** Define Data Models
+- [x] **INF-4** Define Data Models
+  - *Status:* Completed. `js/models.js` created with Unit, Bill, Payment classes. DB seeded with 44 Units.
 
 ### 2. Epic: Monthly Bill Management (Admin)
 - [ ] **BILL-1** Record New Bill
