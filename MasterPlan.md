@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** PAY-3 (Payment History per Unit)
-**Next Priority:** DASH-1 (Dashboard Layout & Data Fetching)
+**Active Task:** DASH-1 (Dashboard Layout & Data Fetching)
+**Next Priority:** DASH-2 (Unit Bar Chart Component)
 
 ## 📊 Progress Tracker
 
@@ -32,7 +32,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Implemented Payment Form in Admin UI with Unit selection and amount input. Payments increment Unit totals atomically.
 - [x] **PAY-2** Receipt Link Input
   - *Status:* Completed. Added optional URL field to Payment Form and saved to Firestore.
-- [ ] **PAY-3** Payment History per Unit
+- [x] **PAY-3** Payment History per Unit
+  - *Status:* Completed. Implemented History Section with Unit Dropdown and Table in Admin UI.
 
 ### 4. Epic: Public Dashboard & Visualization
 - [ ] **DASH-1** Dashboard Layout & Data Fetching

@@ -144,6 +144,31 @@
                             <span id="payment-form-status" class="small-note"></span>
                         </fieldset>
                     </form>
+                    
+                    <hr>
+                    <section id="payment-history-section">
+                        <h3>Payment History per Unit</h3>
+                        <div class="form-group">
+                            <label for="history-unit-select">Select Unit to View:</label>
+                            <select id="history-unit-select">
+                                <option value="">--Select Unit--</option>
+                                <!-- populated by JS -->
+                            </select>
+                        </div>
+                        <table id="payment-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount (RM)</th>
+                                    <th>Reference</th>
+                                    <th>Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4">Select a unit to view history.</td></tr>
+                            </tbody>
+                        </table>
+                    </section>
                 </div>
             </div>
         </section>
