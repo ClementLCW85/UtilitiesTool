@@ -22,7 +22,7 @@ const googleConfig = {
     scopes: "https://www.googleapis.com/auth/drive.file",
     // Google Apps Script Proxy URL for Public No-Auth Uploads
     // Follow DEPLOY_INSTRUCTIONS.md to get this URL
-    scriptUrl: "" 
+    scriptUrl: "https://script.google.com/macros/s/AKfycbzBOitKYDRq-v4JQc9-myXsvFop7FC-Mt3IqZU0EUaEu-s5laahV27tq4U51UK8DSWNNA/exec" 
 };
 
 
