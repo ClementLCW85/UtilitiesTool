@@ -22,6 +22,7 @@ The goal is to develop a web-based application to manage and track the collectio
 	- Date of Payment
 - **Public Submission:** Residents must be able to submit payment records via a public interface.
 	- **Proof of Payment:** Capability to upload an image file (receipt). These images must be stored in the same **Google Drive** location used for Admin uploads.
+	- **Seamless Experience:** Residents must NOT be required to sign in with a Google Account to upload files. The system must proxy the upload to the Admin's drive securely.
 - Owners can contribute varying amounts each month.
 
 ### 3.3 Contribution Tracking & Dashboard

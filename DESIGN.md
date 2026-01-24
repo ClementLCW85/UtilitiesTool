@@ -6,6 +6,7 @@ The **Seapark Apartment Block E Utility Tracker** is a web-based application des
 ## 2. Tech Stack
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+).
 - **Backend/Database:** Google Firebase (Firestore) - NoSQL Database.
+- **Middleware:** Google Apps Script (Serverless Proxy for Public Uploads).
 - **File Storage:** Google Drive API (Store images in Admin's Drive).
 - **Authentication:** Google Firebase Auth (Email/Password).
 - **Hosting:** GitHub Pages (Static Hosting).
@@ -80,7 +81,7 @@ Stores global aggregates.
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
 -   **Bill Recording:** Admin validates form -> Saves `Bill` -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
 -   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
--   **Public Submission:** Resident selects Unit -> Input Amount -> Uploads Image (Auths with Google) -> App sends to Drive -> Returns URL -> Batch Write (Create `Payment` + Increment `Unit`).
+-   **Public Submission:** Resident selects Unit -> Input Amount -> Selects File -> App POSTs Base64 data to GAS Web App -> GAS saves to Admin Drive -> Returns URL -> App writes to Firestore.
 
 ## 8. Feature Log (Current Capabilities)
 *Updated interactively during development.*
@@ -104,4 +105,5 @@ Stores global aggregates.
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
+| **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 
