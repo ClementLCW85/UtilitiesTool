@@ -194,7 +194,8 @@ th {
 }
 
 #unit-bar-chart {
-    min-width: 1200px; /* Ensure space for 44 units */
+    width: 100%;
+    /* removed min-width to allow fitting 44 units in one view */
     height: 400px !important;
 }
 

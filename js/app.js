@@ -171,19 +171,15 @@ function renderChart(units, target) {
     const data = units.map(u => u.totalContributed);
     const backgroundColors = units.map(u => u.isHighlighted ? 'rgba(255, 159, 64, 0.7)' : 'rgba(54, 162, 235, 0.7)');
     const borderColors = units.map(u => u.isHighlighted ? 'rgba(255, 159, 64, 1)' : 'rgba(54, 162, 235, 1)');
+    const tickColors = units.map(u => u.isHighlighted ? 'orange' : '#666');
 
     // Target Line Data (same value for all points)
     const targetData = new Array(units.length).fill(target);
 
     // Dynamic Width Adjustment for Visualization
-    // If few units (e.g. filtered by floor), fit to screen.
-    // If many units, force wide width for scrolling.
-    if (units.length <= 15) {
-        ctx.style.minWidth = '0'; // Allow shrinking
-        ctx.style.width = '100%'; 
-    } else {
-        ctx.style.minWidth = '1200px'; 
-    }
+    // Always fit to container (remove scroll requirement)
+    ctx.style.minWidth = '0'; 
+    ctx.style.width = '100%'; 
 
     if (unitChartInstance) {
         unitChartInstance.destroy();
@@ -235,7 +231,13 @@ function renderChart(units, target) {
             },
             scales: {
                 x: {
-                    stacked: true
+                    stacked: true,
+                    ticks: {
+                        color: tickColors,
+                        autoSkip: false, // Ensure all 44 labels show if possible, might need adjustment if too crowded
+                        maxRotation: 90,
+                        minRotation: 90 // Vertical labels to fit 44
+                    }
                 },
                 y: {
                     beginAtZero: true
