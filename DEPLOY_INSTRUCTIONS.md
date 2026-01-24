@@ -10,13 +10,13 @@ To enable seamless public file uploads without requiring residents to login, you
     *   Name it `Seapark Utility Receipt Uploader`.
     *   Delete any code in `Code.gs` and paste the content from `google-apps-script/Code.gs` (in this repo).
 
-2.  **Configurations (Optional)**
-    *   If you want files to go to a specific folder in your Google Drive (instead of Root):
-        *   Create the folder in Drive.
-        *   Get the ID from the URL (e.g., `folders/12345abcde...`).
-        *   Modify the script to use `DriveApp.getFolderById("YOUR_ID").createFile(blob)`.
+2.  **Configurations (Folder Support)**
+    *   This script supports dynamic folder selection via the client configuration.
+    *   If you want to store receipts in a specific folder, you do **not** need to edit the script.
+    *   Instead, you will add the Folder ID to `js/config.js` after deployment.
 
 3.  **Deploy as Web App**
+    *   **IMPORTANT:** If you are updating an existing script, you must create a **New deployment** (Version: New) for changes to take effect.
     *   Click `Deploy` (top right) -> `New deployment`.
     *   Click the gear icon (Select type) -> `Web app`.
     *   **Description**: `v1 Public Upload`.

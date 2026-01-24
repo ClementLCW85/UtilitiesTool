@@ -794,4 +794,3 @@ function bindDataExport() {
         }
     });
 }
-
