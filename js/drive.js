@@ -77,7 +77,8 @@ const DriveService = {
             const metadata = {
                 'name': `Seapark_Receipt_${Date.now()}_${file.name}`,
                 'mimeType': file.type || 'application/octet-stream',
-                // Optional: 'parents': ['FOLDER_ID'] 
+                 // Use configured folder if available
+                'parents': window.googleConfig.folderId ? [window.googleConfig.folderId] : [] 
             };
             
             const formData = new FormData();
@@ -127,7 +128,8 @@ const DriveService = {
                 const payload = {
                     filename: `PublicUpload_${Date.now()}_${file.name}`,
                     mimeType: file.type,
-                    fileData: base64Content
+                    fileData: base64Content,
+                    folderId: window.googleConfig.folderId || "" 
                 };
 
                 try {

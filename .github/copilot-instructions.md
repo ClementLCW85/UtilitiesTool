@@ -3,22 +3,41 @@
 ## Purpose
 This file provides specific operational instructions for the AI assistant ("GitHub Copilot") when working on the **Seapark Apartment Block E Utility Tracker** project.
 
-## Key Project File Locations
+## Project File & Folder Structure
 
-The following important project files are located in the repository root:
-- `Requirement.md` — Project requirements and scope
-- `MasterPlan.md` — Master development plan and progress
-- `README.md` — Project overview, deployment, and configuration
-- `DESIGN.md` — System design, architecture, and feature log
+- **Root Directory**: Contains all main project files and documentation.
+    - `Requirement.md` — Project requirements and scope
+    - `MasterPlan.md` — Master development plan and progress
+    - `README.md` — Project overview, deployment, and configuration
+    - `DESIGN.md` — System design, architecture, and feature log
+    - `ProductBacklog.md` — Product backlog and user stories
+    - `DEPLOY_INSTRUCTIONS.md` — Deployment and integration instructions
+    - `fix_eol.ps1` — Script for normalizing EOL in markdown files
+- **js/**: All JavaScript source files (frontend logic, models, database, authentication, Drive integration)
+- **css/**: Stylesheets for the web application
+- **google-apps-script/**: Google Apps Script backend code for Drive proxy uploads
+- **tools/**: Utility scripts for formatting and enforcing code standards (e.g., `format_files.ps1`)
+- **.github/**: GitHub-specific configuration and automation
+    - `copilot-instructions.md` — This file (AI operational rules)
+    - **prompts/**: All prompt files for Copilot and automation triggers (e.g., `commit-and-push.prompt.md`, `ai-task-trigger.prompt.md`, `format-code.prompt.md`). **All prompt files must be placed in this folder.**
+    - **workflows/**: GitHub Actions workflow files (e.g., `deploy.yml`)
 
 ## Operational Rules
 
+### 0. Code Formatting & Standards (Strict)
+**trigger:** Whenever any file is created or modified.
+**action:** You **MUST** ensure the following standards are applied. After making edits, you SHOULD run `powershell -File tools/format_files.ps1` to enforce compliance.
 
-### 0. Markdown Newline Format
-**rule:** All markdown (`.md`) files generated or modified for this project **MUST** use CRLF (`\r\n`) as the newline format.
+#### Markdown (`.md`)
+- **Indentation:** Spaces (Use 4 spaces).
+- **Line Sequence:** CRLF (`\r\n`).
+- **Encoding:** UTF-8.
 
-### 0.1 Markdown Indentation
-**rule:** All markdown (`.md`) files generated or modified for this project **MUST** use **Tabs** (`\t`) for indentation instead of spaces.
+#### JavaScript (`.js`)
+- **Indentation:** 2 Spaces.
+- **Line Sequence:** LF (`\n`).
+- **Encoding:** UTF-8.
+- **EOF:** File must end with a single newline character.
 
 ### 1. Feature Logging
 **trigger:** Every time you generate a commit message, pull request description, or build log summary.

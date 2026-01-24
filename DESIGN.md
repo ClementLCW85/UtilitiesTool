@@ -72,10 +72,10 @@ Stores global aggregates.
 -   View Total Break-even status.
 -   Submit Payment Records (with Receipt).
 2.  **Admin:**
-		-   Secure Login.
-		-   Record/Edit/Delete Monthly Bills.
-		-   Record/View Unit Payments.
-		-   Manage Special Cases (Hardship units).
+        -   Secure Login.
+        -   Record/Edit/Delete Monthly Bills.
+        -   Record/View Unit Payments.
+        -   Manage Special Cases (Hardship units).
 
 ## 7. System Flows
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
