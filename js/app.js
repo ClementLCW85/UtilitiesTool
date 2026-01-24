@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Threshold Override
     bindThresholdManagement();
 
+    // Bind Data Export
+    bindDataExport();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -623,6 +626,71 @@ function bindThresholdManagement() {
             status.textContent = "Error saving settings.";
             status.style.color = "red";
         }
+    });
+}
+
+// ADM-3 Data Export
+function bindDataExport() {
+    const btn = document.getElementById('export-data-btn');
+    const status = document.getElementById('export-status');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        status.textContent = "Generating Export...";
+        status.style.color = "blue";
+        btn.disabled = true;
+
+        try {
+            // Fetch Bills
+            const billsSnap = await window.db.collection('bills').get();
+            const bills = [];
+            billsSnap.forEach(doc => bills.push(doc.data()));
+
+            // Fetch Payments
+            const paymentsSnap = await window.db.collection('payments').get();
+            const payments = [];
+            paymentsSnap.forEach(doc => payments.push(doc.data()));
+
+            // Fetch Units (to backup notes/highlight status)
+            const unitsSnap = await window.db.collection('units').get();
+            const units = [];
+            unitsSnap.forEach(doc => units.push(doc.data()));
+
+            // Fetch System Stats (manual override settings)
+            const statsSnap = await window.db.collection('system').doc('stats').get();
+            const stats = statsSnap.exists ? statsSnap.data() : {};
+
+            const exportData = {
+                exportedAt: new Date().toISOString(),
+                stats: stats,
+                units: units,
+                bills: bills,
+                payments: payments
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `seapark_backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            status.textContent = "Export Complete!";
+            status.style.color = "green";
+        } catch (err) {
+            console.error(err);
+            status.textContent = "Export Failed.";
+            status.style.color = "red";
+        } finally {
+            btn.disabled = false;
+        }
+    });
+}
     });
 }
 

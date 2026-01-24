@@ -99,3 +99,4 @@ Stores global aggregates.
 | **DASH-5**| **Mobile Responsive** | Fluid layout and horizontally scrolling tables for small screens. | ✅ Available |
 | **ADM-1** | **Unit Status Mgmt** | Admin interface to toggle Highlight status and edit Public Notes. | ✅ Available |
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
+| **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
