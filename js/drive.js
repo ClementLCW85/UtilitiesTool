@@ -104,6 +104,53 @@ const DriveService = {
         }
     },
 
+    /**
+     * Uploads to Admin Drive via Google Apps Script Proxy.
+     * Does NOT require user Google Login.
+     */
+    uploadViaProxy: async function(file) {
+        if (!file) throw new Error("No file provided.");
+        
+        // Use Global Config
+        const SCRIPT_URL = window.googleConfig.scriptUrl;
+        if (!SCRIPT_URL) {
+            throw new Error("Script URL not configured. See DEPLOY_INSTRUCTIONS.md");
+        }
+
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                 // Split "data:image/png;base64,..." to get just the base64 part
+                const base64Content = reader.result.split(',')[1];
+                
+                const payload = {
+                    filename: `PublicUpload_${Date.now()}_${file.name}`,
+                    mimeType: file.type,
+                    fileData: base64Content
+                };
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const json = await response.json();
+                    
+                    if (json.status === 'success') {
+                        resolve(json.url);
+                    } else {
+                        reject("Script Error: " + (json.message || "Unknown error"));
+                    }
+                } catch (err) {
+                    reject("Network/Upload Error: " + err.message);
+                }
+            };
+            reader.onerror = error => reject(error);
+        });
+    },
+
     makeFilePublic: async function(fileId, token) {
         try {
             await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {

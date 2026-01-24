@@ -4,7 +4,7 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** PAY-4 Public Payment Submission (Residents submit payment records via public interface)
+**Active Task:** None (All Tasks Completed)
 **Next Priority:** Maintenance & Documentation
 
 
@@ -37,6 +37,8 @@ Updates to this document should happen after completing each user story.
 	- *Status:* Completed. Implemented History Section with Unit Dropdown and Table in Admin UI.
 	- [x] **PAY-4** Public Payment Submission
 		- *Status:* Completed. Implemented public form with Google Drive receipt upload and Firestore batch write.
+	- [x] **PAY-5** Seamless Public Upload (GAS Proxy)
+		- *Status:* Completed. Implemented Google Apps Script proxy code and updated frontend to allow no-auth uploads.
 
 ### 4. Epic: Public Dashboard & Visualization
 - [x] **DASH-1** Dashboard Layout & Data Fetching

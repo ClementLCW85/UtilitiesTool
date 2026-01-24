@@ -504,13 +504,22 @@ function bindPublicPaymentForm() {
             return;
         }
 
-        status.textContent = "Authenticating with Google & Uploading...";
+        status.textContent = "Uploading Receipt...";
         try {
             if (!window.DriveService) {
                  throw new Error("Drive Service not loaded.");
             }
-            // This might trigger a popup
-            receiptUrl = await window.DriveService.uploadFile(file);
+            
+            // PAY-5: Use Proxy Upload (No-Login)
+            if (window.googleConfig.scriptUrl) {
+                 status.textContent = "Uploading Receipt (Secure Proxy)...";
+                 receiptUrl = await window.DriveService.uploadViaProxy(file);
+            } else {
+                 console.warn("GAS Script URL not found, falling back to Auth method.");
+                 status.textContent = "Authenticating with Google & Uploading...";
+                 receiptUrl = await window.DriveService.uploadFile(file);
+            }
+
             console.log("Uploaded Receipt:", receiptUrl);
             status.textContent = "Receipt Uploaded. Saving Record...";
         } catch (uploadError) {

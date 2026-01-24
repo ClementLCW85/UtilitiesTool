@@ -28,6 +28,7 @@
 | PAY-2 | Receipt Image Upload | File upload interface to select image/pdf. System handles upload to Google Drive via API and retrieves web view link. | High | PAY-1 |
 | PAY-3 | Payment History per Unit | Admin view to see ledger of payments for a specific unit. | Medium | PAY-1 |
 | PAY-4 | Public Payment Submission | Interface for residents to submit payment records and upload receipts. | High | PAY-2 |
+| PAY-5 | Seamless Public Upload (GAS Proxy) | Implement Google Apps Script proxy to allow public uploads without user Google Auth. | High | PAY-4 |
 
 ## 4. Epic: Public Dashboard & Visualization
 **Goal:** Transparently display contributions and status to all users.

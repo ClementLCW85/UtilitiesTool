@@ -7,6 +7,8 @@
 4. Ensure all markdown files use CRLF line endings and tab indentation as per project rules.
 5. Consult `DESIGN.md` Section 8 (Feature Log) and append a summary of currently available features to the commit message as required by `.github/copilot-instructions.md`.
 
+**Use a standard, cost-effective LLM for this task (not a high-cost or advanced planning model).**
+
 ## Example Commit Message Format
 ```
 PAY-4 Public Payment Submission: Implemented public payment form, Drive upload, and Firestore integration.
@@ -21,4 +23,3 @@ PAY-4 Public Payment Submission: Implemented public payment form, Drive upload, 
 - Unit Status Management (Available)
 - Manual Threshold Override (Available)
 - Data Export (Available)
-```
