@@ -1,0 +1,16 @@
+Chore: Enforce formatting and update prompt/AI instructions
+
+- Ran tools/format_files.ps1 to enforce CRLF/Spaces for MD, LF/2 spaces for JS, UTF-8 encoding
+- Updated .github/copilot-instructions.md to clarify folder structure and prompt file location
+
+---
+**Current System Capabilities:**
+- Core Infrastructure & Auth (Available)
+- Bill Management: Create, Read, Update, Delete, Auto-Calc (Available)
+- Payment Recording (Available)
+- Public Payment Submission (Available)
+- Seamless Public Upload (GAS Proxy) (Available)
+- Dashboard & Visualization (Available)
+- Unit Status Management (Available)
+- Manual Threshold Override (Available)
+- Data Export (Available)
