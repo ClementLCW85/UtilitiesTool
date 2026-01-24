@@ -94,3 +94,4 @@ Stores global aggregates.
 | **DASH-2**| **Unit Bar Chart** | Bar chart visualization of contributions per unit (1-44). | ✅ Available |
 | **DASH-3**| **Threshold Line** | Visual target break-even line on the unit bar chart. | ✅ Available |
 | **DASH-4**| **Highlighted Status**| Visual indicator (Orange bar) and Tooltip note for special units. | ✅ Available |
+| **DASH-5**| **Mobile Responsive** | Fluid layout and horizontally scrolling tables for small screens. | ✅ Available |
