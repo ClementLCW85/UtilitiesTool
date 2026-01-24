@@ -66,19 +66,21 @@ Stores global aggregates.
 
 ## 6. User Roles
 1.  **Public User (Resident):**
-    -   View Dashboard (Charts, Tables).
-    -   See which units have contributed vs target.
-    -   View Total Break-even status.
+-   View Dashboard (Charts, Tables).
+-   See which units have contributed vs target.
+-   View Total Break-even status.
+-   Submit Payment Records (with Receipt).
 2.  **Admin:**
-    -   Secure Login.
-    -   Record/Edit/Delete Monthly Bills.
-    -   Record/View Unit Payments.
-    -   Manage Special Cases (Hardship units).
+		-   Secure Login.
+		-   Record/Edit/Delete Monthly Bills.
+		-   Record/View Unit Payments.
+		-   Manage Special Cases (Hardship units).
 
 ## 7. System Flows
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
 -   **Bill Recording:** Admin validates form -> Saves `Bill` -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
 -   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
+-   **Public Submission:** Resident selects Unit -> Input Amount -> Uploads Image (Auths with Google) -> App sends to Drive -> Returns URL -> Batch Write (Create `Payment` + Increment `Unit`).
 
 ## 8. Feature Log (Current Capabilities)
 *Updated interactively during development.*
@@ -101,3 +103,5 @@ Stores global aggregates.
 | **ADM-1** | **Unit Status Mgmt** | Admin interface to toggle Highlight status and edit Public Notes. | ✅ Available |
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
+| **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
+
