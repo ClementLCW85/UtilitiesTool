@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.location.hash || window.location.hash === '#dashboard') {
         loadDashboardData();
     }
+    
+    // Bind Chart Controls
+    bindChartEvents();
 
     // Bind Bill Form Logic
     bindBillForm();
@@ -65,6 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Global variable to track editing state
 let editingBillId = null;
 let unitChartInstance = null; // Track Chart.js instance
+let dashboardUnits = []; // Store fetched units
+let dashboardTarget = 0; // Store target value
 
 function populateUnitDropdown() {
     const targets = ['payment-unit', 'history-unit-select'];
@@ -122,12 +127,16 @@ async function loadDashboardData() {
             totalCollected += (data.totalContributed || 0);
             unitsData.push(data);
         });
+        
+        // Store globally for filtering
+        dashboardUnits = unitsData;
+        dashboardTarget = stats.unitTarget;
 
         // 3. Render Stats
         updateDashboardStats(stats.totalBillsAmount, stats.unitTarget, totalCollected);
 
-        // 4. Render Chart
-        renderUnitBarChart(unitsData, stats.unitTarget);
+        // 4. Render Chart (Default: All)
+        filterAndRenderChart('all');
 
     } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -588,4 +597,38 @@ async function fetchPaymentHistory(unitId) {
         console.error("Error fetching payment history:", error);
         tbody.innerHTML = `<tr><td colspan="4" style="color:red">Error: ${error.message}</td></tr>`;
     }
+}
+
+function bindChartEvents() {
+    const buttons = document.querySelectorAll('.floor-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Remove active class from all
+            buttons.forEach(b => b.classList.remove('active'));
+            // Add to clicked
+            e.target.classList.add('active');
+            
+            const floor = e.target.dataset.floor;
+            filterAndRenderChart(floor);
+        });
+    });
+}
+
+function filterAndRenderChart(floor) {
+    if (!dashboardUnits || dashboardUnits.length === 0) return;
+
+    let filteredUnits = [];
+    const canvas = document.getElementById('unit-bar-chart');
+
+    if (floor === 'all') {
+        filteredUnits = [...dashboardUnits];
+        if (canvas) canvas.style.minWidth = '1200px';
+    } else {
+        // Filter by Unit Number pattern "E-{floor}.."
+        const prefix = `E-${floor}`;
+        filteredUnits = dashboardUnits.filter(u => u.unitNumber.startsWith(prefix));
+        if (canvas) canvas.style.minWidth = '600px';
+    }
+
+    renderUnitBarChart(filteredUnits, dashboardTarget);
 }

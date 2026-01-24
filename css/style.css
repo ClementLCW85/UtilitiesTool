@@ -197,3 +197,25 @@ th {
     min-width: 1200px; /* Ensure space for 44 units */
     height: 400px !important;
 }
+
+/* Chart Controls */
+#chart-controls {
+    margin-bottom: 1rem;
+}
+
+.floor-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+}
+
+.floor-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.floor-btn.active {
+    background-color: #0078d7;
+    color: white;
+    border-color: #005a9e;
+}
