@@ -25,7 +25,7 @@
 | ID | Title | Description | Priority | Dependencies |
 |----|-------|-------------|----------|--------------|
 | PAY-1 | Record Unit Payment | Form for Admin to select Unit (1-44), Input Amount, Date, and Optional Reference Note. | High | INF-3, INF-4 |
-| PAY-2 | Receipt Link Input | specific field in Payment Form to paste a URL (e.g., Google Drive link) for the payment proof. | High | PAY-1 |
+| PAY-2 | Receipt Image Upload | File upload interface to select image/pdf. System handles upload to Google Drive via API and retrieves web view link. | High | PAY-1 |
 | PAY-3 | Payment History per Unit | Admin view to see ledger of payments for a specific unit. | Medium | PAY-1 |
 
 ## 4. Epic: Public Dashboard & Visualization

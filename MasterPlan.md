@@ -5,7 +5,8 @@ Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
 **Active Task:** None (All Tasks Completed)
-**Next Priority:** Maintenance & Usage Monitoring
+**Next Priority:** Maintenance & Documentation
+
 
 ## 📊 Progress Tracker
 
@@ -30,8 +31,8 @@ Updates to this document should happen after completing each user story.
 ### 3. Epic: Owner Payment Management (Admin)
 - [x] **PAY-1** Record Unit Payment
   - *Status:* Completed. Implemented Payment Form in Admin UI with Unit selection and amount input. Payments increment Unit totals atomically.
-- [x] **PAY-2** Receipt Link Input
-  - *Status:* Completed. Added optional URL field to Payment Form and saved to Firestore.
+- [x] **PAY-2** Receipt Image Upload & Drive Integration
+- *Status:* Completed. Implemented Google Drive API File Upload (Multipart) and integrated with Payment Form.
 - [x] **PAY-3** Payment History per Unit
   - *Status:* Completed. Implemented History Section with Unit Dropdown and Table in Admin UI.
 

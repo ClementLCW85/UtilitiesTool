@@ -6,6 +6,7 @@ The **Seapark Apartment Block E Utility Tracker** is a web-based application des
 ## 2. Tech Stack
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+).
 - **Backend/Database:** Google Firebase (Firestore) - NoSQL Database.
+- **File Storage:** Google Drive API (Store images in Admin's Drive).
 - **Authentication:** Google Firebase Auth (Email/Password).
 - **Hosting:** GitHub Pages (Static Hosting).
 - **CI/CD:** GitHub Actions (Automated Deployment).
@@ -77,7 +78,7 @@ Stores global aggregates.
 ## 7. System Flows
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
 -   **Bill Recording:** Admin validates form -> Saves `Bill` -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
--   **Payment Recording:** Admin selects Unit -> Input Amount -> Batch Write (Create `Payment` doc + Increment `Unit.totalContributed`).
+-   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
 
 ## 8. Feature Log (Current Capabilities)
 *Updated interactively during development.*

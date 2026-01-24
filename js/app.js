@@ -420,14 +420,36 @@ function bindPaymentForm() {
         const amount = parseFloat(document.getElementById('payment-amount').value);
         const date = document.getElementById('payment-date').value;
         const ref = document.getElementById('payment-ref').value;
-        const receipt = document.getElementById('payment-receipt').value;
+        
+        // Handle File Upload
+        const fileInput = document.getElementById('payment-receipt-file');
+        const file = fileInput.files[0];
+        let receiptUrl = "";
+
+        if (file) {
+            status.textContent = "Uploading Receipt to Drive...";
+            try {
+                // Determine if DriveService is ready
+                if (!window.DriveService) {
+                     throw new Error("Drive Service not loaded.");
+                }
+                receiptUrl = await window.DriveService.uploadFile(file);
+                console.log("Uploaded Receipt:", receiptUrl);
+                status.textContent = "Saving Payment Record...";
+            } catch (uploadError) {
+                console.error("Drive Upload Error:", uploadError);
+                status.textContent = "Upload Failed: " + (uploadError.message || uploadError);
+                status.style.color = "red";
+                return; // Stop processing
+            }
+        }
 
         try {
             const batch = window.db.batch();
             
             // 1. Create Payment Record
             const paymentRef = window.db.collection('payments').doc();
-            const payment = new window.Models.Payment(unitNum, amount, date, ref, receipt);
+            const payment = new window.Models.Payment(unitNum, amount, date, ref, receiptUrl);
             batch.set(paymentRef, payment.toFirestore());
 
             // 2. Increment Unit Total
