@@ -219,3 +219,58 @@ th {
     color: white;
     border-color: #005a9e;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    main {
+        padding: 10px;
+        margin-top: 10px;
+        width: 100%;
+        box-shadow: none;
+    }
+
+    header {
+        padding: 0.5rem;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-header button {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    #chart-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .floor-btn {
+        margin: 2px;
+        flex: 1 1 auto;
+        font-size: 0.9rem;
+    }
+}
+
+/* Table Wrapper for Horizontal Scroll */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+}
+
+.table-wrapper table {
+    margin-top: 0;
+    min-width: 600px; /* Force scroll on small screens */
+}
