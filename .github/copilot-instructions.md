@@ -35,9 +35,9 @@ This file provides specific operational instructions for the AI assistant ("GitH
 
 #### JavaScript (`.js`)
 - **Indentation:** 2 Spaces.
-- **Line Sequence:** LF (`\n`).
+- **Line Sequence:** CRLF (`\r\n`).
 - **Encoding:** UTF-8.
-- **EOF:** File must end with a single newline character.
+- **EOF:** File must end with a single CRLF newline character.
 
 ### 1. Feature Logging
 **trigger:** Every time you generate a commit message, pull request description, or build log summary.

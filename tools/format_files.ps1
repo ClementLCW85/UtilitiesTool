@@ -26,7 +26,7 @@ Get-ChildItem -Recurse -Filter *.md | Where-Object { $_.FullName -notmatch 'node
     Write-Host "Formatted (MD/CRLF): $($_.Name)"
 }
 
-# 2. JAVASCRIPT: LF, 2 Spaces, Single Final Newline, UTF-8
+# 2. JAVASCRIPT: CRLF, 2 Spaces, Single Final CRLF, UTF-8
 Get-ChildItem -Recurse -Filter *.js | Where-Object { $_.FullName -notmatch 'node_modules|\.git' } | ForEach-Object {
     $path = $_.FullName
     $content = [System.IO.File]::ReadAllText($path)
@@ -37,11 +37,14 @@ Get-ChildItem -Recurse -Filter *.js | Where-Object { $_.FullName -notmatch 'node
     # Convert Tabs to 2 Spaces
     $content = $content -replace "`t", "  "
     
-    # Ensure Single Final Newline
-    $content = $content.TrimEnd() + "`n"
+    # Convert to CRLF
+    $content = $content -replace "`n", "`r`n"
+    
+    # Ensure Single Final CRLF
+    $content = $content.TrimEnd() + "`r`n"
     
     Write-Utf8NoBom -Path $path -Content $content
-    Write-Host "Formatted (JS/LF): $($_.Name)"
+    Write-Host "Formatted (JS/CRLF): $($_.Name)"
 }
 
 Write-Host "Formatting Complete."
