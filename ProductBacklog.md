@@ -50,3 +50,11 @@
 | ADM-1 | Unit Status Management | Admin interface to toggle "Highlighted" status for a unit and edit the associated Public Note. | Medium | INF-3, INF-4 |
 | ADM-2 | Manual Threshold Override | Option for Admin to manually set the Threshold Line value (overriding the auto-sum) if needed for adjustments. | Low | DASH-3 |
 | ADM-3 | Data Export | Button to download current state (bills/payments) as JSON/CSV for backup. | Low | BILL-1, PAY-1 |
+
+## 6. Epic: Collection Rounds Management
+**Goal:** Manage and visualize specific fundraising rounds.
+
+| ID | Title | Description | Priority | Dependencies |
+|----|-------|-------------|----------|--------------|
+| COL-1 | Define Collection Round (Admin) | Form to Create/Edit a Round: Title, Amount, Start Date, Remarks, and Participating Units (Multi-select). | High | INF-4 |
+| COL-2 | Collection Round Visualization (Public) | Dashboard component to show the Latest Round details and a clickable list/modal for History. | High | COL-1 |

@@ -44,5 +44,19 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Unit Management:**
     - **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").
 
+### 3.5 Collection Rounds Management
+- The system must define distinct "Collection Rounds" (e.g., "Special Maintenance Levy").
+- **Round Definition:**
+    - **Total Target Amount:** How much needs to be collected in this round.
+    - **Participating Units:** Identification of which specific units are involved (e.g., all 44, or a specific subset).
+    - **Start Date:** The effective date of the collection round.
+    - **Remarks:** Explanation of why this collection is required.
+- **Admin Capabilities:**
+    - Create new Collection Rounds.
+    - Modify existing Collection Rounds (e.g., change the target amount or involved units).
+- **Public Dashboard:**
+    - **Active Round:** Display the details of the latest/current collection round.
+    - **History:** Provide a view to list past collection rounds for transparency.
+
 ## 4. Next Steps
 This requirements document will be used to generate the **Product Backlog** and strictly guide the **Feature Design** phase.

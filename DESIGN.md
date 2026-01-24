@@ -58,8 +58,17 @@ Stores global aggregates.
 - `totalBillsAmount` (Number): Sum of all `bills`.
 - `unitTarget` (Number): `totalBillsAmount` / 44.
 - `isOverrideEnabled` (Boolean): If true, use `overrideTarget`.
-- `overrideTarget` (Number): Manual override for `unitTarget`.
 - `lastUpdated` (Timestamp).
+
+### Collection: `collection_rounds`
+Represents specific calls for funds or levies.
+- `id` (Auto-ID).
+- `title` (String): e.g., "Lift Maintenance 2024".
+- `targetAmount` (Number): Total to collect in this round.
+- `startDate` (String): ISO Date YYYY-MM-DD.
+- `participatingUnitIds` (Array of Strings): List of `unitNumber`s effectively involved.
+- `remarks` (String): Explanation for the residents.
+- `createdAt` (Timestamp).
 
 ## 5. Modules & Code Structure
 - **`index.html`**: Single Page Application (SPA) container. Switches views via hash routing.
@@ -112,4 +121,5 @@ Stores global aggregates.
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
+| **COL-1** | **Define Rounds** | Admin interface to define specific collection rounds and participants. | ✅ Available |
 

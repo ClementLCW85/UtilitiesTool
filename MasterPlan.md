@@ -62,6 +62,12 @@ Updates to this document should happen after completing each user story.
 - [x] **ADM-3** Data Export
 - *Status:* Completed. Implemented JSON export of Bills, Payments, Units, and System Stats.
 
+### 6. Epic: Collection Rounds Management
+- [x] **COL-1** Define Collection Round
+    - *Status:* Completed. Admin interface implemented to Create/Edit rounds with unit selection.
+- [ ] **COL-2** Dashboard Round Display
+    - *Status:* Pending. Public dashboard widget for Latest Round + History.
+
 ## 📝 Notes & Decisions
 - **Hosting:** GitHub Pages via GitHub Actions.
 - **Database Strategy:** Firebase Firestore (Free Tier). Configuration via `js/config.js`.

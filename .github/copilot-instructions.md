@@ -25,7 +25,7 @@ This file provides specific operational instructions for the AI assistant ("GitH
 ## Operational Rules
 
 ### 0. Code Formatting & Standards (Strict)
-**trigger:** Whenever any file is created or modified.
+**trigger:** Only run during commits and push the code. It shall be the first to run before any git command is performed.
 **action:** You **MUST** ensure the following standards are applied. After making edits, you SHOULD run `powershell -File tools/format_files.ps1` to enforce compliance.
 
 #### Markdown (`.md`)
