@@ -14,9 +14,9 @@ const firebaseConfig = {
 
 
 // Google Drive API Configuration (OAuth 2.0)
-// TODO: Replace with your actual OAuth 2.0 Client ID from Google Cloud Console
+// NOTE: 'client_secret' is NOT needed for this client-side implicit flow and should NOT be exposed here.
 const googleConfig = {
-    clientId: "YOUR_GOOGLE_CLIENT_ID", // e.g., "1234567890-abc.apps.googleusercontent.com"
+    clientId: "182471854682-eui3ncg12rg8mi7o89hjuicgi04n89r9.apps.googleusercontent.com", 
     // Scope for Drive API: 'https://www.googleapis.com/auth/drive.file' allows access only to files created by this app.
     scopes: "https://www.googleapis.com/auth/drive.file"
 };
