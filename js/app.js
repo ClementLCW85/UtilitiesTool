@@ -175,6 +175,16 @@ function renderChart(units, target) {
     // Target Line Data (same value for all points)
     const targetData = new Array(units.length).fill(target);
 
+    // Dynamic Width Adjustment for Visualization
+    // If few units (e.g. filtered by floor), fit to screen.
+    // If many units, force wide width for scrolling.
+    if (units.length <= 15) {
+        ctx.style.minWidth = '0'; // Allow shrinking
+        ctx.style.width = '100%'; 
+    } else {
+        ctx.style.minWidth = '1200px'; 
+    }
+
     if (unitChartInstance) {
         unitChartInstance.destroy();
     }
