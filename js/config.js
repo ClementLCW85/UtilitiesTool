@@ -21,6 +21,8 @@ const googleConfig = {
     scopes: "https://www.googleapis.com/auth/drive.file"
 };
 
+
+
 // Export config for use in other modules
 // Note: In a real module system we would use 'export', but for simple browser inclusion we'll stick to global or window scope 
 // or simpler, just let this file run before the app initialization.
