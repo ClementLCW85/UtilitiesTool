@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** ADM-2 (Manual Threshold Override)
-**Next Priority:** ADM-3 (Data Export)
+**Active Task:** ADM-3 (Data Export)
+**Next Priority:** None (Epics Complete)
 
 ## 📊 Progress Tracker
 
@@ -50,7 +50,8 @@ Updates to this document should happen after completing each user story.
 ### 5. Epic: Unit & System Administration
 - [x] **ADM-1** Unit Status Management
   - *Status:* Completed. Admin interface implemented to toggle Highlight and edit Public Note.
-- [ ] **ADM-2** Manual Threshold Override
+- [x] **ADM-2** Manual Threshold Override
+  - *Status:* Completed. Implemented manual target override in Admin/System Config and updated Dashboard logic.
 - [ ] **ADM-3** Data Export
 
 ## 📝 Notes & Decisions
