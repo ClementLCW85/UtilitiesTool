@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** ADM-3 (Data Export)
-**Next Priority:** None (Epics Complete)
+**Active Task:** None (All Tasks Completed)
+**Next Priority:** Maintenance & Usage Monitoring
 
 ## 📊 Progress Tracker
 
@@ -52,7 +52,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Admin interface implemented to toggle Highlight and edit Public Note.
 - [x] **ADM-2** Manual Threshold Override
   - *Status:* Completed. Implemented manual target override in Admin/System Config and updated Dashboard logic.
-- [ ] **ADM-3** Data Export
+- [x] **ADM-3** Data Export
+- *Status:* Completed. Implemented JSON export of Bills, Payments, Units, and System Stats.
 
 ## 📝 Notes & Decisions
 - **Hosting:** GitHub Pages via GitHub Actions.
