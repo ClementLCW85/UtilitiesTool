@@ -174,8 +174,9 @@
                                 <input type="text" id="payment-ref" placeholder="e.g. Oct Contribution">
                             </div>
                             <div class="form-group">
-                                <label for="payment-receipt">Receipt Link (Optional):</label>
-                                <input type="url" id="payment-receipt" placeholder="e.g. https://drive.google.com/...">
+                                <label for="payment-receipt-file">Receipt Image:</label>
+                                <input type="file" id="payment-receipt-file" accept="image/*,application/pdf">
+                                <p class="small-note">Selecting a file will auto-upload to Admin's Google Drive upon record.</p>
                             </div>
                             <button type="submit">Record Payment</button>
                             <span id="payment-form-status" class="small-note"></span>
@@ -292,6 +293,9 @@
 
     <!-- App Scripts -->
     <script src="js/config.js"></script>
+    <script src="js/drive.js"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="handleGisLoad()"></script>
+
     <script src="js/db.js"></script>
     <script src="js/models.js"></script>
     <script src="js/auth.js"></script>

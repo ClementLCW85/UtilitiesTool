@@ -33,7 +33,7 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Admin Interface:** A secured interface restricted to administrators.
   - **Authentication:** Secured via a single **Master Password**.
 - **Payment Recording:** Admins can manually add payment records for each unit/owner.
-  - **Proof of Payment:** Input field to store a **Google Drive Link** (or similar URL) pointing to the receipt image. The system will not host files directly.
+  - **Proof of Payment:** Capability to upload an image file (receipt). The system will upload this file to the Admin's **Google Drive** using the Drive API and store the resulting shareable link.
 - **Threshold & Bill Management:** Admins record the monthly bill amounts, which automatically updates the global "Break-Even Threshold."
 - **Unit Management:**
   - **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").
