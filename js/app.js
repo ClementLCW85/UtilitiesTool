@@ -1172,16 +1172,16 @@ async function loadLatestRound() {
         widget.style.display = 'block';
 
         // Populate Basic Info
-        const titleEl = document.getElementById('round-title');
+        const titleEl = document.getElementById('widget-round-title');
         if (titleEl) titleEl.innerText = round.title;
         
         const targetEl = document.getElementById('round-target');
         if (targetEl) targetEl.innerText = formatCurrency(round.targetAmount);
 
-        const dateEl = document.getElementById('round-start-date');
+        const dateEl = document.getElementById('widget-round-start-date');
         if (dateEl) dateEl.innerText = round.startDate;
 
-        const remarksEl = document.getElementById('round-remarks');
+        const remarksEl = document.getElementById('widget-round-remarks');
         if (remarksEl) remarksEl.innerText = round.remarks || '';
 
         // Calculate Collected Amount
