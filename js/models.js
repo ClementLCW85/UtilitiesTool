@@ -102,6 +102,46 @@ class ArchivedPayment extends Payment {
     }
 }
 
+/**
+ * CollectionRound Model
+ * Represents a specific call for funds (e.g., "Special Levy 2024").
+ */
+class CollectionRound {
+    constructor(title, targetAmount, startDate, participatingUnitIds = [], remarks = "") {
+        this.title = title;
+        this.targetAmount = Number(targetAmount);
+        this.startDate = startDate; // YYYY-MM-DD
+        this.participatingUnitIds = participatingUnitIds; // Array of string IDs
+        this.remarks = remarks;
+        this.createdAt = new Date();
+    }
+
+    toFirestore() {
+        return {
+            title: this.title,
+            targetAmount: this.targetAmount,
+            startDate: this.startDate,
+            participatingUnitIds: this.participatingUnitIds,
+            remarks: this.remarks,
+            createdAt: this.createdAt
+        };
+    }
+
+    static fromFirestore(doc) {
+        const data = doc.data();
+        const round = new CollectionRound(
+            data.title,
+            data.targetAmount,
+            data.startDate,
+            data.participatingUnitIds,
+            data.remarks
+        );
+        round.id = doc.id;
+        round.createdAt = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : new Date();
+        return round;
+    }
+}
+
 // Service to help with Data Management
 const SchemaService = {
     // Generate standard Unit ID string (E-101 to E-111, E-201 to E-211, etc.)
@@ -197,5 +237,6 @@ window.Models = {
     Bill,
     Payment,
     ArchivedPayment,
+    CollectionRound,
     SchemaService
 };

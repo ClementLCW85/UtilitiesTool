@@ -66,11 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Archive Management
     bindArchiveEvents();
 
+    // Bind Collection Rounds Management
+    bindCollectionRoundManagement();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 fetchBills();
+                fetchCollectionRounds();
             } else {
                 // Clear table on logout
                 const tbody = document.querySelector('#bill-history-table tbody');
@@ -919,4 +923,223 @@ function deleteArchivedPayment(docId) {
             console.error(err);
             alert("Failed to delete record.");
         });
+}
+
+// --- Collection Rounds Management ---
+
+let editingRoundId = null;
+
+function bindCollectionRoundManagement() {
+    initRoundUnitSelector();
+    bindRoundForm();
+}
+
+function initRoundUnitSelector() {
+    const list = document.getElementById('round-unit-list');
+    if (!list) return;
+
+    list.innerHTML = "";
+    for (let i = 0; i < 44; i++) {
+        const unitId = window.Models.SchemaService.formatUnitId(i);
+        // Create Checkbox Wrapper
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.fontSize = '12px';
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = unitId;
+        input.id = `chk-${unitId}`;
+        input.className = 'round-unit-chk';
+        input.style.width = 'auto';
+        input.style.marginRight = '4px';
+        input.checked = true; // Default Select All
+
+        const label = document.createElement('label');
+        label.htmlFor = `chk-${unitId}`;
+        label.textContent = unitId;
+        label.style.margin = '0';
+        label.style.cursor = 'pointer';
+
+        div.appendChild(input);
+        div.appendChild(label);
+        list.appendChild(div);
+    }
+
+    // Bind "Select All"
+    const allChk = document.getElementById('round-all-units');
+    if (allChk) {
+        allChk.checked = true;
+        allChk.addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.round-unit-chk');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+        });
+    }
+}
+
+function bindRoundForm() {
+    const form = document.getElementById('collection-round-form');
+    if (!form) return;
+
+    // Reset / Cancel Button
+    const cancelBtn = document.getElementById('round-cancel-btn');
+    cancelBtn.addEventListener('click', () => {
+        form.reset();
+        document.getElementById('round-id').value = "";
+        document.getElementById('round-submit-btn').textContent = "Save Collection Round";
+        cancelBtn.style.display = "none";
+        editingRoundId = null;
+        // Reset Selector
+        document.getElementById('round-all-units').checked = true;
+        document.querySelectorAll('.round-unit-chk').forEach(cb => cb.checked = true);
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('round-form-status');
+        status.textContent = "Saving...";
+        status.style.color = "blue";
+
+        const title = document.getElementById('round-title').value;
+        const amount = document.getElementById('round-amount').value;
+        const date = document.getElementById('round-start-date').value;
+        const remarks = document.getElementById('round-remarks').value;
+        
+        // Get Participating Units
+        const participating = [];
+        document.querySelectorAll('.round-unit-chk:checked').forEach(cb => {
+            participating.push(cb.value);
+        });
+
+        if (participating.length === 0) {
+            status.textContent = "Error: At least one unit must participate.";
+            status.style.color = "red";
+            return;
+        }
+
+        try {
+            const round = new window.Models.CollectionRound(title, amount, date, participating, remarks);
+            
+            // If editing, preserve ID and CreatedAt
+            if (editingRoundId) {
+                // Use set/update
+                await window.db.collection('collection_rounds').doc(editingRoundId).set(round.toFirestore());
+            } else {
+                // Create New
+                await window.db.collection('collection_rounds').add(round.toFirestore());
+            }
+
+            status.textContent = "Round Saved Successfully!";
+            status.style.color = "green";
+            
+            // Reset Form (Trigger Cancel logic to clean up UI)
+            cancelBtn.click();
+            
+            fetchCollectionRounds();
+
+        } catch (error) {
+            console.error("Error saving round:", error);
+            status.textContent = "Error saving round: " + error.message;
+            status.style.color = "red";
+        }
+    });
+}
+
+function fetchCollectionRounds() {
+    window.db.collection('collection_rounds').orderBy('startDate', 'desc').get()
+        .then((snapshot) => {
+            const tbody = document.querySelector('#collection-rounds-table tbody');
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="5">No collection rounds found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const round = window.Models.CollectionRound.fromFirestore(doc);
+                const tr = document.createElement('tr');
+                
+                const unitCount = round.participatingUnitIds.length;
+                const unitText = unitCount === 44 ? "All (44)" : `${unitCount} Units`;
+
+                tr.innerHTML = `
+                    <td>${round.title}</td>
+                    <td>RM ${round.targetAmount.toFixed(2)}</td>
+                    <td>${round.startDate}</td>
+                    <td title="${round.participatingUnitIds.join(', ')}">${unitText}</td>
+                    <td>
+                        <button class="edit-round-btn small-btn" data-id="${doc.id}">Edit</button>
+                        <button class="delete-round-btn small-btn danger" data-id="${doc.id}">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Bind Row Actions
+            document.querySelectorAll('.edit-round-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => openRoundEdit(e.target.dataset.id));
+            });
+            document.querySelectorAll('.delete-round-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => deleteRound(e.target.dataset.id));
+            });
+
+        })
+        .catch((error) => {
+            console.error("Error fetching rounds:", error);
+            const tbody = document.querySelector('#collection-rounds-table tbody');
+            tbody.innerHTML = '<tr><td colspan="5">Error loading rounds.</td></tr>';
+        });
+}
+
+async function deleteRound(id) {
+    if (!confirm("Are you sure you want to delete this Collection Round?")) return;
+    try {
+        await window.db.collection('collection_rounds').doc(id).delete();
+        fetchCollectionRounds();
+    } catch (e) {
+        alert("Error deleting round: " + e.message);
+    }
+}
+
+async function openRoundEdit(id) {
+    try {
+        const doc = await window.db.collection('collection_rounds').doc(id).get();
+        if (!doc.exists) return;
+
+        const round = window.Models.CollectionRound.fromFirestore(doc);
+        
+        document.getElementById('round-id').value = round.id;
+        document.getElementById('round-title').value = round.title;
+        document.getElementById('round-amount').value = round.targetAmount;
+        document.getElementById('round-start-date').value = round.startDate;
+        document.getElementById('round-remarks').value = round.remarks;
+        
+        // Update Units
+        const allChk = document.getElementById('round-all-units');
+        allChk.checked = false; // Reset first
+        
+        const checkboxes = document.querySelectorAll('.round-unit-chk');
+        let allChecked = true;
+        checkboxes.forEach(cb => {
+            if (round.participatingUnitIds.includes(cb.value)) {
+                cb.checked = true;
+            } else {
+                cb.checked = false;
+                allChecked = false;
+            }
+        });
+        if (allChecked) allChk.checked = true;
+
+        editingRoundId = round.id;
+        document.getElementById('round-submit-btn').textContent = "Update Collection Round";
+        document.getElementById('round-cancel-btn').style.display = "inline-block";
+        
+        // Scroll to form
+        document.getElementById('collection-rounds-section').scrollIntoView();
+
+    } catch (e) {
+        console.error("Edit error:", e);
+        alert("Could not load round details.");
+    }
 }
