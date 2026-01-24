@@ -48,9 +48,11 @@ Represents individual payments made by owners.
 ### Collection: `system`
 Stores global aggregates.
 - Document: `stats`
-    - `totalBillsAmount` (Number): Sum of all `bills`.
-    - `unitTarget` (Number): `totalBillsAmount` / 44.
-    - `lastUpdated` (Timestamp).
+- `totalBillsAmount` (Number): Sum of all `bills`.
+- `unitTarget` (Number): `totalBillsAmount` / 44.
+- `isOverrideEnabled` (Boolean): If true, use `overrideTarget`.
+- `overrideTarget` (Number): Manual override for `unitTarget`.
+- `lastUpdated` (Timestamp).
 
 ## 5. Modules & Code Structure
 - **`index.html`**: Single Page Application (SPA) container. Switches views via hash routing.
@@ -96,3 +98,4 @@ Stores global aggregates.
 | **DASH-4**| **Highlighted Status**| Visual indicator (Orange bar) and Tooltip note for special units. | ✅ Available |
 | **DASH-5**| **Mobile Responsive** | Fluid layout and horizontally scrolling tables for small screens. | ✅ Available |
 | **ADM-1** | **Unit Status Mgmt** | Admin interface to toggle Highlight status and edit Public Notes. | ✅ Available |
+| **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |

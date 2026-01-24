@@ -54,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Unit Status Management
     bindUnitManagement();
 
+    // Bind Threshold Override
+    bindThresholdManagement();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -133,13 +136,30 @@ async function loadDashboardData() {
         
         // Store globally for filtering
         dashboardUnits = unitsData;
-        dashboardTarget = stats.unitTarget || 0;
+        
+        // Handle Threshold Override
+        if (stats.isOverrideEnabled && stats.overrideTarget !== undefined) {
+             dashboardTarget = stats.overrideTarget;
+             // UI hint could be added here that target is overridden
+        } else {
+             dashboardTarget = stats.unitTarget || 0;
+        }
 
         // Update Stats DOM
         document.getElementById('stat-total-bills').innerText = formatCurrency(stats.totalBillsAmount);
-        document.getElementById('stat-unit-target').innerText = formatCurrency(stats.unitTarget);
+        
+        // Display "Manual" label if overridden
+        const targetEl = document.getElementById('stat-unit-target');
+        targetEl.innerText = formatCurrency(dashboardTarget);
+        if (stats.isOverrideEnabled) {
+            targetEl.innerText += " (M)";
+            targetEl.title = "Manual Override Active";
+        }
+
         document.getElementById('stat-total-collected').innerText = formatCurrency(totalCollected);
 
+        // Break-even definition: TotalCollected vs TotalBills
+        // (Note: Some might argue break-even is vs Target * 44, but semantically TotalBills is the 'Cost')
         const diff = totalCollected - stats.totalBillsAmount;
         const statusEl = document.getElementById('stat-status');
         statusEl.innerText = (diff >= 0 ? "+" : "") + formatCurrency(diff);
@@ -373,11 +393,12 @@ async function calculateGlobalBreakEven() {
 
     const unitTarget = total / 44;
 
+    // Use merge to preserve 'isOverrideEnabled' and 'overrideTarget'
     await window.db.collection('system').doc('stats').set({
         totalBillsAmount: total,
         unitTarget: unitTarget,
         lastUpdated: new Date()
-    });
+    }, { merge: true });
     console.log("Global Stats Updated:", total, unitTarget);
 }
 
@@ -532,6 +553,74 @@ function bindUnitManagement() {
         } catch (err) {
             console.error(err);
             status.textContent = "Update failed.";
+            status.style.color = "red";
+        }
+    });
+}
+
+// ADM-2 Manual Threshold Override
+function bindThresholdManagement() {
+    console.log("Binding Threshold Management...");
+    const form = document.getElementById('threshold-form');
+    const check = document.getElementById('threshold-override-check');
+    const amount = document.getElementById('threshold-amount');
+    const status = document.getElementById('threshold-form-status');
+
+    if (!form) return;
+
+    // Fetch current settings on load (or when section becomes visible, but we do it once here)
+    // We can reuse the loadDashboardData fetch if we stored it globally, but fetching fresh is safer for Admin
+    // Since this is Admin specific, we'll fetch once logic binds.
+    window.db.collection('system').doc('stats').get().then(doc => {
+        if(doc.exists) {
+            const data = doc.data();
+            if (data.isOverrideEnabled) {
+                check.checked = true;
+                amount.disabled = false;
+                amount.value = data.overrideTarget || '';
+            } else {
+                check.checked = false;
+                amount.disabled = true;
+                // Suggest current auto target
+                amount.placeholder = (data.unitTarget || 0).toFixed(2);
+            }
+        }
+    });
+
+    // Toggle Input
+    check.addEventListener('change', () => {
+        amount.disabled = !check.checked;
+        if (check.checked && !amount.value) {
+            // If enabling, maybe prefill with placeholder
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        status.textContent = "Saving Settings...";
+        status.style.color = "blue";
+
+        const isEnabled = check.checked;
+        const val = parseFloat(amount.value);
+
+        if (isEnabled && (isNaN(val) || val < 0)) {
+            status.textContent = "Invalid Amount.";
+            status.style.color = "red";
+            return;
+        }
+
+        try {
+            await window.db.collection('system').doc('stats').set({
+                isOverrideEnabled: isEnabled,
+                overrideTarget: isEnabled ? val : 0 // Save 0 or persist old, doesn't matter if disabled
+            }, { merge: true });
+
+            status.textContent = "Settings Saved!";
+            status.style.color = "green";
+            loadDashboardData(); // Refresh UI immediately
+        } catch(err) {
+            console.error(err);
+            status.textContent = "Error saving settings.";
             status.style.color = "red";
         }
     });
