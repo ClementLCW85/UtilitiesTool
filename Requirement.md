@@ -37,6 +37,9 @@ The goal is to develop a web-based application to manage and track the collectio
     - **Authentication:** Secured via a single **Master Password**.
 - **Payment Recording:** Admins can manually add payment records for each unit/owner.
     - **Proof of Payment:** Capability to upload an image file (receipt). The system will upload this file to the Admin's **Google Drive** using the Drive API and store the resulting shareable link.
+- **Payment Record Management:**
+    - **Removal & Archiving:** Admins can remove payment records from the active database. Removed records are moved to an archive table and must not be included in the calculation of total collected funds.
+    - **Archive Cleanup:** Admins can permanently delete records from the archive database.
 - **Threshold & Bill Management:** Admins record the monthly bill amounts, which automatically updates the global "Break-Even Threshold."
 - **Unit Management:**
     - **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").

@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Data Export
     bindDataExport();
 
+    // Bind Archive Management
+    bindArchiveEvents();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -562,22 +565,22 @@ function bindPaymentHistoryEvents() {
     select.addEventListener('change', async (e) => {
         const unitId = e.target.value;
         const tbody = document.querySelector('#payment-history-table tbody');
-        tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
         
         if (!unitId) {
-            tbody.innerHTML = '<tr><td colspan="4">Select a unit to view history.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5">Select a unit to view history.</td></tr>';
             return;
         }
 
         try {
             const snapshot = await window.db.collection('payments')
                 .where('unitNumber', '==', unitId)
-                .orderBy('date', 'desc') // Requires Index probably, if fails try without orderBy or create index
+                .orderBy('date', 'desc') 
                 .get();
 
             tbody.innerHTML = '';
             if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="4">No payments found for this unit.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5">No payments found for this unit.</td></tr>';
                 return;
             }
 
@@ -589,14 +592,58 @@ function bindPaymentHistoryEvents() {
                     <td>${formatCurrency(data.amount)}</td>
                     <td>${data.reference || '-'}</td>
                     <td>${data.receiptUrl ? '<a href="' + data.receiptUrl + '" target="_blank">View</a>' : '-'}</td>
+                    <td><button class="delete-payment-btn" data-id="${doc.id}" style="background-color:#dc3545; padding: 2px 8px; font-size: 0.8rem;">Delete</button></td>
                 `;
                 tbody.appendChild(tr);
             });
+            
+            // Bind delete buttons
+            document.querySelectorAll('.delete-payment-btn').forEach(btn => {
+                btn.addEventListener('click', (ev) => {
+                    const id = ev.target.getAttribute('data-id');
+                    archivePayment(id, unitId);
+                });
+            });
 
         } catch (error) {
-            console.error("Payment history error. Might need composite index.", error);
-            tbody.innerHTML = '<tr><td colspan="4">Error loading history (Check Console).</td></tr>';
+            console.error("Payment history error.", error);
+            tbody.innerHTML = '<tr><td colspan="5">Error loading history.</td></tr>';
         }
+    });
+}
+
+function archivePayment(paymentId, unitId) {
+    if(!confirm("Are you sure you want to DELETE this payment? It will be moved to the archive and deducted from the unit sum.")) return;
+
+    const paymentRef = window.db.collection('payments').doc(paymentId);
+    const archiveRef = window.db.collection('archived_payments').doc(paymentId); // Keep ID
+    const unitRef = window.db.collection('units').doc(unitId);
+
+    window.db.runTransaction(async (transaction) => {
+        const paymentDoc = await transaction.get(paymentRef);
+        if (!paymentDoc.exists) throw "Payment does not exist!";
+        
+        const paymentData = paymentDoc.data();
+        const amount = paymentData.amount; // Ensure number
+
+        // 1. Create Archive Record using Model
+        const archivedData = new window.Models.ArchivedPayment({...paymentData, id: paymentId}).toFirestore();
+        transaction.set(archiveRef, archivedData);
+
+        // 2. Decrement Unit Total
+        const decrement = window.firebase.firestore.FieldValue.increment(-amount);
+        transaction.update(unitRef, { totalContributed: decrement });
+
+        // 3. Delete Original
+        transaction.delete(paymentRef);
+    }).then(() => {
+        alert("Payment Archived.");
+        // Refresh Table
+        const select = document.getElementById('history-unit-select');
+        select.dispatchEvent(new Event('change')); 
+    }).catch((error) => {
+        console.error("Archive failed: ", error);
+        alert("Failed to archive payment.");
     });
 }
 
@@ -793,4 +840,83 @@ function bindDataExport() {
             btn.disabled = false;
         }
     });
+}
+
+// PAY-6 Archive Management
+function bindArchiveEvents() {
+    const toggleBtn = document.getElementById('toggle-archive-btn');
+    const section = document.getElementById('archived-payments-section');
+    
+    if (!toggleBtn || !section) return;
+
+    toggleBtn.addEventListener('click', () => {
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            toggleBtn.textContent = 'Hide Archived Payments';
+            loadArchivedPayments(); // Load data when opening
+        } else {
+            section.style.display = 'none';
+            toggleBtn.textContent = 'View Archived Payments';
+        }
+    });
+}
+
+function loadArchivedPayments() {
+    const tbody = document.querySelector('#archived-history-table tbody');
+    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+    window.db.collection('archived_payments')
+        .orderBy('archivedAt', 'desc')
+        .limit(50) // Limit display
+        .get()
+        .then(snapshot => {
+             tbody.innerHTML = '';
+             if(snapshot.empty) {
+                 tbody.innerHTML = '<tr><td colspan="5">No archived payments found.</td></tr>';
+                 return;
+             }
+
+             snapshot.forEach(doc => {
+                 const data = doc.data();
+                 const archivedDate = data.archivedAt && data.archivedAt.toDate ? 
+                                    data.archivedAt.toDate().toLocaleDateString() : 
+                                    'Unknown';
+
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `
+                    <td>${data.unitNumber}</td>
+                    <td>${data.date}</td>
+                    <td>${formatCurrency(data.amount)}</td>
+                    <td>${archivedDate}</td>
+                    <td><button class="delete-permanent-btn" data-id="${doc.id}" style="background-color:#dc3545; padding: 2px 8px; font-size: 0.8rem;">Permanently Delete</button></td>
+                 `;
+                 tbody.appendChild(tr);
+             });
+
+             // Bind permanent delete
+             document.querySelectorAll('.delete-permanent-btn').forEach(btn => {
+                btn.addEventListener('click', (ev) => {
+                    const id = ev.target.getAttribute('data-id');
+                    deleteArchivedPayment(id);
+                });
+            });
+        })
+        .catch(err => {
+            console.error("Error loading archive:", err);
+            tbody.innerHTML = '<tr><td colspan="5">Error loading archive.</td></tr>';
+        });
+}
+
+function deleteArchivedPayment(docId) {
+    if(!confirm("WARNING: This will PERMANENTLY DELETE this record from the archive. This action cannot be undone. Are you sure?")) return;
+
+    window.db.collection('archived_payments').doc(docId).delete()
+        .then(() => {
+            alert("Record permanently deleted.");
+            loadArchivedPayments(); // Refresh
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Failed to delete record.");
+        });
 }

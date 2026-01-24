@@ -47,6 +47,11 @@ Represents individual payments made by owners.
 - `receiptUrl` (String): Link to proof of payment (optional).
 - `createdAt` (Timestamp).
 
+### Collection: `archived_payments`
+Stores payments that were removed from the active ledger.
+- Same schema as `payments`, plus:
+- `archivedAt` (Timestamp).
+
 ### Collection: `system`
 Stores global aggregates.
 - Document: `stats`
@@ -106,4 +111,5 @@ Stores global aggregates.
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
+| **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
 

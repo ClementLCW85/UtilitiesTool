@@ -242,10 +242,36 @@
                                         <th>Amount (RM)</th>
                                         <th>Reference</th>
                                         <th>Receipt</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="4">Select a unit to view history.</td></tr>
+                                    <tr><td colspan="5">Select a unit to view history.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button id="toggle-archive-btn" type="button" style="background-color: #6c757d;">View Archived Payments</button>
+                    </div>
+
+                    <section id="archived-payments-section" style="display:none; margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                        <h3>Archived Payments (Trash)</h3>
+                        <p class="small-note">Records here are excluded from all totals.</p>
+                        <div class="table-wrapper">
+                            <table id="archived-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Unit</th>
+                                        <th>Date</th>
+                                        <th>Amount (RM)</th>
+                                        <th>Archived At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5">Loading archive...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -320,7 +346,6 @@
     </main>
 
     <footer>
-        <p>&copy; Seapark Block E Management</p>
         <p style="font-size: 0.9em; color: #888; margin-top: 4px;">
             This page is created as an experiment. The creator is not responsible for any damages or losses caused by using it.
         </p>
