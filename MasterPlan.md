@@ -65,8 +65,8 @@ Updates to this document should happen after completing each user story.
 ### 6. Epic: Collection Rounds Management
 - [x] **COL-1** Define Collection Round
     - *Status:* Completed. Admin interface implemented to Create/Edit rounds with unit selection.
-- [ ] **COL-2** Dashboard Round Display
-    - *Status:* Pending. Public dashboard widget for Latest Round + History.
+- [x] **COL-2** Dashboard Round Display
+- *Status:* Completed. Public dashboard widget created with `loadLatestRound` and history toggle.
 
 ## 📝 Notes & Decisions
 - **Hosting:** GitHub Pages via GitHub Actions.

@@ -46,6 +46,44 @@
                 </div>
             </div>
 
+            <!-- Collection Round Widget -->
+            <div id="collection-round-widget" class="info-card" style="display:none; margin-bottom: 20px;">
+                <div class="card-header-flex">
+                    <h3>Active Fund Round</h3>
+                    <button id="round-history-btn" class="text-btn">View History</button>
+                </div>
+                <div class="round-content">
+                    <h4 id="round-title" style="margin-top: 0; color: #0078d7;">Loading...</h4>
+                    
+                    <div class="round-metrics">
+                        <div class="metric-item">
+                            <span class="label">Target:</span>
+                            <span id="round-target" class="value">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">Collected:</span>
+                            <span id="round-collected" class="value">-</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div id="round-progress-bar" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <div style="text-align: right; font-size: 0.8rem; margin-top: 5px;">
+                        <span id="round-percent">0%</span>
+                    </div>
+
+                    <p id="round-remarks" class="round-remarks"></p>
+                    <p class="small-note">Includes payments since <span id="round-start-date">-</span> from participating units.</p>
+                </div>
+
+                <!-- History Container (Hidden by default) -->
+                <div id="round-history-container" style="display:none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+                     <h4 style="margin-top:0; font-size: 1rem;">Past Rounds</h4>
+                     <ul id="round-history-list" style="list-style: none; padding: 0; font-size: 0.9rem;"></ul>
+                </div>
+            </div>
+
             <div id="chart-controls" style="text-align: center; margin-bottom: 10px;">
                 <label>Filter by Floor: </label>
                 <button class="floor-btn active" data-floor="all">All</button>
@@ -410,6 +448,17 @@
                 </div>
             </div>
         </section>
+
+        <!-- Round History Modal -->
+        <div id="round-history-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-round-history" class="close-modal">&times;</span>
+                <h3>Collection Round History</h3>
+                <div id="round-history-list" class="history-list">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer>

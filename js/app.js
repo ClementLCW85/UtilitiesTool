@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Collection Rounds Management
     bindCollectionRoundManagement();
 
+    // Bind Public Round History
+    bindRoundHistoryEvents();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -180,6 +183,9 @@ async function loadDashboardData() {
 
         // Render Chart
         renderChart(dashboardUnits, dashboardTarget);
+
+        // Load Collection Round (Public)
+        loadLatestRound();
 
     } catch (error) {
         console.error("Dashboard Load Error:", error);
@@ -1142,4 +1148,146 @@ async function openRoundEdit(id) {
         console.error("Edit error:", e);
         alert("Could not load round details.");
     }
+}
+
+// Public Round Visualization
+async function loadLatestRound() {
+    const widget = document.getElementById('collection-round-widget');
+    if (!widget) return;
+
+    try {
+        const snapshot = await window.db.collection('collection_rounds')
+            .orderBy('startDate', 'desc')
+            .limit(1)
+            .get();
+
+        if (snapshot.empty) {
+            widget.style.display = 'none';
+            return;
+        }
+
+        const doc = snapshot.docs[0];
+        const round = window.Models.CollectionRound.fromFirestore(doc);
+        
+        widget.style.display = 'block';
+
+        // Populate Basic Info
+        const titleEl = document.getElementById('round-title');
+        if (titleEl) titleEl.innerText = round.title;
+        
+        const targetEl = document.getElementById('round-target');
+        if (targetEl) targetEl.innerText = formatCurrency(round.targetAmount);
+
+        const dateEl = document.getElementById('round-start-date');
+        if (dateEl) dateEl.innerText = round.startDate;
+
+        const remarksEl = document.getElementById('round-remarks');
+        if (remarksEl) remarksEl.innerText = round.remarks || '';
+
+        // Calculate Collected Amount
+        // Query payments where date >= round.startDate
+        const paySnapshot = await window.db.collection('payments')
+            .where('date', '>=', round.startDate)
+            .get();
+
+        let collected = 0;
+        paySnapshot.forEach(pDoc => {
+            const payment = pDoc.data();
+            // Verify unit participation
+            if (round.participatingUnitIds && round.participatingUnitIds.includes(payment.unitNumber)) {
+                collected += (payment.amount || 0);
+            }
+        });
+
+        const collectedEl = document.getElementById('round-collected');
+        if (collectedEl) collectedEl.innerText = formatCurrency(collected);
+        
+        // Progress Logic
+        let pct = 0;
+        if (round.targetAmount > 0) {
+            pct = (collected / round.targetAmount) * 100;
+        }
+        
+        const bar = document.getElementById('round-progress-bar');
+        const pctText = document.getElementById('round-percent');
+        
+        if (bar) {
+            bar.style.width = Math.min(pct, 100) + '%';
+             if (pct >= 99.9) {
+                bar.style.backgroundColor = 'var(--success-color)';
+            } else {
+                bar.style.backgroundColor = '#0078d7';
+            }
+        }
+        
+        if (pctText) pctText.innerText = pct.toFixed(1) + '%';
+
+    } catch (e) {
+        console.error("Error loading round:", e);
+        widget.style.display = 'none';
+    }
+}
+
+function bindRoundHistoryEvents() {
+    const btn = document.getElementById('round-history-btn');
+    const container = document.getElementById('round-history-container');
+    const list = document.getElementById('round-history-list');
+
+    if (!btn || !container || !list) return;
+
+    btn.addEventListener('click', async () => {
+         if (container.style.display === 'none') {
+             container.style.display = 'block';
+             btn.textContent = 'Hide History';
+             
+             // Fetch History if empty
+             if (list.children.length === 0 || list.innerHTML.includes('Loading')) {
+                list.innerHTML = '<li>Loading...</li>';
+                
+                try {
+                    const snapshot = await window.db.collection('collection_rounds')
+                        .orderBy('startDate', 'desc')
+                        .limit(6) // Limit to last 6 rounds
+                        .get();
+                    
+                    list.innerHTML = '';
+                    const docs = snapshot.docs;
+                    
+                    // Skip the first one if it's currently displayed as active,
+                    // assuming the query matches the one in loadLatestRound
+                    if (docs.length <= 1) {
+                         list.innerHTML = '<li>No prior collection rounds.</li>';
+                         return;
+                    }
+
+                    // Start from index 1 (Skip Active)
+                    for (let i = 1; i < docs.length; i++) {
+                        const round = window.Models.CollectionRound.fromFirestore(docs[i]);
+                        const li = document.createElement('li');
+                        li.style.marginBottom = '10px';
+                        li.style.padding = '8px';
+                        li.style.backgroundColor = '#f4f4f4';
+                        li.style.fontSize = '0.85rem';
+                        li.style.borderRadius = '4px';
+                        
+                        li.innerHTML = `
+                            <strong>${round.title}</strong>
+                            <div style="display:flex; justify-content:space-between; margin-top:4px; color:#555;">
+                                <span>Target: ${formatCurrency(round.targetAmount)}</span>
+                                <span>Start: ${round.startDate}</span>
+                            </div>
+                        `;
+                        list.appendChild(li);
+                    }
+                } catch (e) {
+                    console.error("History error:", e);
+                    list.innerHTML = '<li style="color:red;">Error loading history.</li>';
+                }
+             }
+
+         } else {
+             container.style.display = 'none';
+             btn.textContent = 'View History';
+         }
+    });
 }

@@ -122,4 +122,5 @@ Represents specific calls for funds or levies.
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
 | **COL-1** | **Define Rounds** | Admin interface to define specific collection rounds and participants. | ✅ Available |
+| **COL-2** | **Round Visualization** | Public Dashboard showing active round, progress, and history. | ✅ Available |
 
