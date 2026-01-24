@@ -67,8 +67,7 @@
         <section id="submit-payment" class="view-section" style="display:none;">
             <h2>Submit Payment</h2>
             <div class="submit-container" style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <p>Residents can use this form to record their monthly contribution. <br> 
-                   <strong>Note:</strong> You will be asked to sign in with Google to upload your receipt.</p>
+                <p>Residents can use this form to record their monthly contribution.</p>
                 
                 <form id="public-payment-form">
                     <fieldset>
@@ -95,7 +94,7 @@
                         <div class="form-group">
                             <label for="public-payment-receipt">Receipt Image (Required):</label>
                             <input type="file" id="public-payment-receipt" accept="image/*,application/pdf" required>
-                            <p class="small-note">Uploaded receipts are stored securely via Google Drive.</p>
+                            <p class="small-note">Please contact admin if your upload fails.</p>
                         </div>
                         <button type="submit">Submit Payment</button>
                         <p id="public-payment-status" class="small-note" style="margin-top: 10px;"></p>
@@ -322,6 +321,9 @@
 
     <footer>
         <p>&copy; Seapark Block E Management</p>
+        <p style="font-size: 0.9em; color: #888; margin-top: 4px;">
+            This page is created as an experiment. The creator is not responsible for any damages or losses caused by using it.
+        </p>
     </footer>
 
     <!-- Firebase SDKs (using version 10.7.1 compat for simpler script tag usage without bundlers, or standard modular via module scripts) -->
