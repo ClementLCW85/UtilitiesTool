@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** DASH-5 (Mobile Responsiveness)
-**Next Priority:** ADM-1 (Unit Status Management)
+**Active Task:** ADM-1 (Unit Status Management)
+**Next Priority:** ADM-2 (Manual Threshold Override)
 
 ## 📊 Progress Tracker
 
@@ -44,7 +44,8 @@ Updates to this document should happen after completing each user story.
   - *Status:* Completed. Added horizontal line to Chart.js representing the target share per unit.
 - [x] **DASH-4** Highlighted Unit Status
   - *Status:* Completed. Implemented logic to color bars orange if `isHighlighted` is true, and show `publicNote` in tooltip.
-- [ ] **DASH-5** Mobile Responsiveness
+- [x] **DASH-5** Mobile Responsiveness
+  - *Status:* Completed. Implemented CSS Media Queries for layout adjustments and Horizontal Scroll for data tables.
 
 ### 5. Epic: Unit & System Administration
 - [ ] **ADM-1** Unit Status Management
