@@ -174,7 +174,11 @@ units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
 const labels = units.map(u => u.unitNumber);
 const data = units.map(u => u.totalContributed);
 const targetData = new Array(units.length).fill(targetValue);
-    
+
+// Prepare color arrays based on isHighlighted status
+const backgroundColors = units.map(u => u.isHighlighted ? '#ff9800' : '#0078d7'); // Orange for highlighted
+const borderColors = units.map(u => u.isHighlighted ? '#e65100' : '#005a9e');
+
 // Destroy previous chart if exists to avoid "Canvas is already in use" error
 if (unitChartInstance) {
     console.log("Destroying existing chart instance.");
@@ -189,8 +193,8 @@ try {
             datasets: [{
                 label: 'Total Contributed (RM)',
                 data: data,
-                backgroundColor: '#0078d7',
-                borderColor: '#005a9e',
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
                 borderWidth: 1,
                 order: 2
             },
@@ -228,6 +232,18 @@ try {
                 plugins: {
                     legend: {
                         position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const index = context.dataIndex;
+                                const unit = units[index];
+                                if (unit && unit.isHighlighted && unit.publicNote) {
+                                    return `Note: ${unit.publicNote}`;
+                                }
+                                return null;
+                            }
+                        }
                     }
                 }
             }
