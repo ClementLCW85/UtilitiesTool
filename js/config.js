@@ -16,7 +16,7 @@ const firebaseConfig = {
 // Google Drive API Configuration (OAuth 2.0)
 // NOTE: 'client_secret' is NOT needed for this client-side implicit flow and should NOT be exposed here.
 const googleConfig = {
-    clientId: "***REMOVED***-eui3ncg12rg8mi7o89hjuicgi04n89r9.apps.googleusercontent.com", 
+    clientId: "***REMOVED***", 
     // Scope for Drive API: 'https://www.googleapis.com/auth/drive.file' allows access only to files created by this app.
     scopes: "https://www.googleapis.com/auth/drive.file"
 };
