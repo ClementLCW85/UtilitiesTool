@@ -39,6 +39,8 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Implemented public form with Google Drive receipt upload and Firestore batch write.
 - [x] **PAY-5** Seamless Public Upload (GAS Proxy)
     - *Status:* Completed. Implemented Google Apps Script proxy code and updated frontend to allow no-auth uploads.
+- [x] **PAY-6** Payment Removal & Archiving
+    - *Status:* Completed. Admin capability to archive records (remove from totals) and permanently delete them from archive.
 
 ### 4. Epic: Public Dashboard & Visualization
 - [x] **DASH-1** Dashboard Layout & Data Fetching

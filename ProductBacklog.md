@@ -29,6 +29,7 @@
 | PAY-3 | Payment History per Unit | Admin view to see ledger of payments for a specific unit. | Medium | PAY-1 |
 | PAY-4 | Public Payment Submission | Interface for residents to submit payment records and upload receipts. | High | PAY-2 |
 | PAY-5 | Seamless Public Upload (GAS Proxy) | Implement Google Apps Script proxy to allow public uploads without user Google Auth. | High | PAY-4 |
+| PAY-6 | Payment Removal & Archiving | Admin capability to archive records (remove from totals) and permanently delete them from archive. | High | PAY-1 |
 
 ## 4. Epic: Public Dashboard & Visualization
 **Goal:** Transparently display contributions and status to all users.

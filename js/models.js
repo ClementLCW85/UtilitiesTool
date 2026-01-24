@@ -76,6 +76,32 @@ class Payment {
     }
 }
 
+/**
+ * ArchivedPayment Model
+ * Represents a payment removed from the active ledger.
+ */
+class ArchivedPayment extends Payment {
+    constructor(paymentData) {
+        super(paymentData.unitNumber, paymentData.amount, paymentData.date, paymentData.reference, paymentData.receiptUrl);
+        // Retain original creation date if available
+        if (paymentData.createdAt) {
+             // Handle both Timestamp and Date objects
+             this.createdAt = paymentData.createdAt.toDate ? paymentData.createdAt.toDate() : new Date(paymentData.createdAt);
+        }
+        this.originalId = paymentData.id || "unknown";
+        this.archivedAt = new Date();
+    }
+
+    toFirestore() {
+        const data = super.toFirestore();
+        data.archivedAt = this.archivedAt;
+        data.originalId = this.originalId;
+        // Apply original createdAt to preserve history
+        data.createdAt = this.createdAt;
+        return data;
+    }
+}
+
 // Service to help with Data Management
 const SchemaService = {
     // Generate standard Unit ID string (E-101 to E-111, E-201 to E-211, etc.)
@@ -170,5 +196,6 @@ window.Models = {
     Unit,
     Bill,
     Payment,
+    ArchivedPayment,
     SchemaService
 };
