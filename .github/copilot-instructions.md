@@ -3,7 +3,22 @@
 ## Purpose
 This file provides specific operational instructions for the AI assistant ("GitHub Copilot") when working on the **Seapark Apartment Block E Utility Tracker** project.
 
+## Key Project File Locations
+
+The following important project files are located in the repository root:
+- `Requirement.md` — Project requirements and scope
+- `MasterPlan.md` — Master development plan and progress
+- `README.md` — Project overview, deployment, and configuration
+- `DESIGN.md` — System design, architecture, and feature log
+
 ## Operational Rules
+
+
+### 0. Markdown Newline Format
+**rule:** All markdown (`.md`) files generated or modified for this project **MUST** use CRLF (`\r\n`) as the newline format.
+
+### 0.1 Markdown Indentation
+**rule:** All markdown (`.md`) files generated or modified for this project **MUST** use **Tabs** (`\t`) for indentation instead of spaces.
 
 ### 1. Feature Logging
 **trigger:** Every time you generate a commit message, pull request description, or build log summary.
@@ -33,3 +48,4 @@ This file provides specific operational instructions for the AI assistant ("GitH
 
 ---
 *End of Instructions*
+

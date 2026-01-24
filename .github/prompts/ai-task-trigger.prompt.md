@@ -14,3 +14,4 @@
 3. Ensure implementation details align with `DESIGN.md`.
 4. Follow the workflow rules in `INSTRUCTION.md` (e.g., updating feature logs).
 5. Generate a plan and proceed with implementation.
+

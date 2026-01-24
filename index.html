@@ -12,6 +12,7 @@
         <nav>
             <ul>
                 <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#submit-payment">Submit Payment</a></li>
                 <li><a href="#admin">Admin</a></li>
             </ul>
         </nav>
@@ -59,6 +60,47 @@
                 <div class="chart-scroll-wrapper">
                     <canvas id="unit-bar-chart"></canvas>
                 </div>
+            </div>
+        </section>
+
+        <!-- Public Payment Section -->
+        <section id="submit-payment" class="view-section" style="display:none;">
+            <h2>Submit Payment</h2>
+            <div class="submit-container" style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <p>Residents can use this form to record their monthly contribution. <br> 
+                   <strong>Note:</strong> You will be asked to sign in with Google to upload your receipt.</p>
+                
+                <form id="public-payment-form">
+                    <fieldset>
+                        <legend>Payment Details</legend>
+                        <div class="form-group">
+                            <label for="public-payment-unit">Unit Number:</label>
+                            <select id="public-payment-unit" required>
+                                <option value="">--Select Your Unit--</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="public-payment-amount">Amount (RM):</label>
+                            <input type="number" id="public-payment-amount" min="0" step="0.01" required placeholder="e.g. 50.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="public-payment-date">Date of Payment:</label>
+                            <input type="date" id="public-payment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="public-payment-ref">Reference (e.g., Bank Ref / Month):</label>
+                            <input type="text" id="public-payment-ref" placeholder="e.g. Ref 123456">
+                        </div>
+                        <div class="form-group">
+                            <label for="public-payment-receipt">Receipt Image (Required):</label>
+                            <input type="file" id="public-payment-receipt" accept="image/*,application/pdf" required>
+                            <p class="small-note">Uploaded receipts are stored securely via Google Drive.</p>
+                        </div>
+                        <button type="submit">Submit Payment</button>
+                        <p id="public-payment-status" class="small-note" style="margin-top: 10px;"></p>
+                    </fieldset>
+                </form>
             </div>
         </section>
 

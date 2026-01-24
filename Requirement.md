@@ -17,9 +17,11 @@ The goal is to develop a web-based application to manage and track the collectio
 - The system must record payments made by each unit owner towards the electric utilities account.
 - **Scope:** The system will manage a fixed list of **44 Units** in Block E.
 - Each transaction record should include:
-  - Unit Number / Owner Name
-  - Amount Paid
-  - Date of Payment
+	- Unit Number / Owner Name
+	- Amount Paid
+	- Date of Payment
+- **Public Submission:** Residents must be able to submit payment records via a public interface.
+	- **Proof of Payment:** Capability to upload an image file (receipt). These images must be stored in the same **Google Drive** location used for Admin uploads.
 - Owners can contribute varying amounts each month.
 
 ### 3.3 Contribution Tracking & Dashboard
@@ -31,12 +33,12 @@ The goal is to develop a web-based application to manage and track the collectio
 
 ### 3.4 Administration (Restricted Access)
 - **Admin Interface:** A secured interface restricted to administrators.
-  - **Authentication:** Secured via a single **Master Password**.
+	- **Authentication:** Secured via a single **Master Password**.
 - **Payment Recording:** Admins can manually add payment records for each unit/owner.
-  - **Proof of Payment:** Capability to upload an image file (receipt). The system will upload this file to the Admin's **Google Drive** using the Drive API and store the resulting shareable link.
+	- **Proof of Payment:** Capability to upload an image file (receipt). The system will upload this file to the Admin's **Google Drive** using the Drive API and store the resulting shareable link.
 - **Threshold & Bill Management:** Admins record the monthly bill amounts, which automatically updates the global "Break-Even Threshold."
 - **Unit Management:**
-  - **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").
+	- **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").
 
 ## 4. Next Steps
 This requirements document will be used to generate the **Product Backlog** and strictly guide the **Feature Design** phase.

@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Bind Payment Form Logic
     bindPaymentForm();
+
+    // Bind Public Payment Form Logic
+    bindPublicPaymentForm();
     
     // Populate UnitsDropdown
     populateUnitDropdown();
@@ -81,7 +84,7 @@ let dashboardUnits = []; // Store fetched units
 let dashboardTarget = 0; // Store target value
 
 function populateUnitDropdown() {
-const targets = ['payment-unit', 'history-unit-select', 'admin-unit-select'];
+const targets = ['payment-unit', 'history-unit-select', 'admin-unit-select', 'public-payment-unit'];
     
 targets.forEach(id => {
         const select = document.getElementById(id);
@@ -469,6 +472,75 @@ function bindPaymentForm() {
         } catch (error) {
             console.error(error);
             status.textContent = "Error recording payment.";
+            status.style.color = "red";
+        }
+    });
+}
+
+// Public Payment Submission
+function bindPublicPaymentForm() {
+    const form = document.getElementById('public-payment-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('public-payment-status');
+        status.textContent = "Processing... (Please wait for prompt)";
+        status.style.color = "blue";
+
+        const unitNum = document.getElementById('public-payment-unit').value;
+        const amount = parseFloat(document.getElementById('public-payment-amount').value);
+        const date = document.getElementById('public-payment-date').value;
+        const ref = document.getElementById('public-payment-ref').value;
+        
+        // Handle File Upload - Required
+        const fileInput = document.getElementById('public-payment-receipt');
+        const file = fileInput.files[0];
+        let receiptUrl = "";
+
+        if (!file) {
+            status.textContent = "Error: Receipt file is required.";
+            status.style.color = "red";
+            return;
+        }
+
+        status.textContent = "Authenticating with Google & Uploading...";
+        try {
+            if (!window.DriveService) {
+                 throw new Error("Drive Service not loaded.");
+            }
+            // This might trigger a popup
+            receiptUrl = await window.DriveService.uploadFile(file);
+            console.log("Uploaded Receipt:", receiptUrl);
+            status.textContent = "Receipt Uploaded. Saving Record...";
+        } catch (uploadError) {
+            console.error("Drive Upload Error:", uploadError);
+            status.textContent = "Upload Failed: " + (uploadError.message || uploadError);
+            status.style.color = "red";
+            return; 
+        }
+
+        try {
+            const batch = window.db.batch();
+            
+            // 1. Create Payment Record (Same Collection)
+            const paymentRef = window.db.collection('payments').doc();
+            const payment = new window.Models.Payment(unitNum, amount, date, ref, receiptUrl);
+            batch.set(paymentRef, payment.toFirestore());
+
+            // 2. Increment Unit Total
+            const unitRef = window.db.collection('units').doc(unitNum);
+            const increment = window.firebase.firestore.FieldValue.increment(amount);
+            batch.update(unitRef, { totalContributed: increment });
+
+            await batch.commit();
+
+            status.textContent = "Payment Submitted Successfully! Thank you.";
+            status.style.color = "green";
+            form.reset();
+        } catch (error) {
+            console.error(error);
+            status.textContent = "Error saving payment to database.";
             status.style.color = "red";
         }
     });
