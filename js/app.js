@@ -458,7 +458,7 @@ function renderChart(units, target, pendingData = [], unclaimedAmount = 0) {
                         afterLabel: function(context) {
                             if (context.dataset.type === 'bar') {
                                 const unit = units[context.dataIndex];
-                                if (unit.isHighlighted && unit.publicNote) {
+                                if (unit && unit.isHighlighted && unit.publicNote) {
                                     return `Note: ${unit.publicNote}`;
                                 }
                             }
