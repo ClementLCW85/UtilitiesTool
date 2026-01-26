@@ -267,6 +267,7 @@ function renderChart(units, target) {
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
                     borderWidth: 1,
+                    minBarLength: 5, // Allow hovering even if 0
                     order: 1
                 }
             ]
@@ -275,6 +276,11 @@ function renderChart(units, target) {
             responsive: true,
             maintainAspectRatio: false, // Important for scroll
             plugins: {
+                title: {
+                    display: true,
+                    text: 'Contributions per Unit',
+                    font: { size: 16 }
+                },
                 tooltip: {
                     callbacks: {
                         afterLabel: function(context) {
@@ -297,10 +303,18 @@ function renderChart(units, target) {
                         autoSkip: false, // Ensure all 44 labels show if possible, might need adjustment if too crowded
                         maxRotation: 90,
                         minRotation: 90 // Vertical labels to fit 44
+                    },
+                    title: {
+                        display: true,
+                        text: 'Total Units Available (44 units)'
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'RM (Payment up to date)'
+                    }
                 }
             }
         }
