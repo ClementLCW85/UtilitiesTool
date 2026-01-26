@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Threshold Override
     bindThresholdManagement();
 
+    // Bind Unclaimed Funds
+    bindUnclaimedManagement();
+
     // Bind Data Export
     bindDataExport();
 
@@ -162,10 +165,11 @@ async function loadDashboardData() {
         // 1. Fetch Global Stats (Total Bills)
         const statsDoc = await window.db.collection('system').doc('stats').get();
         const stats = statsDoc.exists ? statsDoc.data() : { totalBillsAmount: 0, unitTarget: 0 };
+        const unclaimed = stats.unclaimedAmount || 0;
         
         // 2. Fetch All Units (Total Collected)
         const unitsSnapshot = await window.db.collection('units').get();
-        let totalCollected = 0;
+        let totalCollected = 0 + unclaimed; // Add unclaimed to start
         const unitsData = [];
 
         unitsSnapshot.forEach(doc => {
@@ -190,6 +194,18 @@ async function loadDashboardData() {
 
         // Update Stats DOM
         document.getElementById('stat-total-bills').innerText = formatCurrency(stats.totalBillsAmount);
+        
+        const collectedEl = document.getElementById('stat-total-collected');
+        collectedEl.innerText = formatCurrency(totalCollected);
+        // Show context if unclaimed exists
+        const collectedLabel = collectedEl.nextElementSibling;
+        if (collectedLabel && collectedLabel.classList.contains('stat-label')) {
+            if (unclaimed > 0) {
+                collectedLabel.innerText = `From 44 Units + Unclaimed (${formatCurrency(unclaimed)})`;
+            } else {
+                collectedLabel.innerText = 'From 44 Units';
+            }
+        }
         
         // Display "Manual" label if overridden
         const targetEl = document.getElementById('stat-unit-target');
@@ -245,7 +261,7 @@ async function loadDashboardData() {
         } catch(e) { console.error("Error fetching pending stats", e); }
 
         // Render Chart
-        renderChart(dashboardUnits, dashboardTarget, pendingData);
+        renderChart(dashboardUnits, dashboardTarget, pendingData, unclaimed);
 
         // Load Collection Round (Public)
         loadLatestRound();
@@ -262,24 +278,32 @@ function formatCurrency(num) {
 }
 
 // Chart.js Logic
-function renderChart(units, target, pendingData = []) {
+function renderChart(units, target, pendingData = [], unclaimedAmount = 0) {
     const ctx = document.getElementById('unit-bar-chart');
     if (!ctx) return;
 
-    // Sort units
-    // Note: 'units' passed here is usually referencing 'dashboardUnits' which is sorted.
-    // If not, sorting might detach indices from pendingData if pendingData isn't sorted same way.
-    // Assuming 'units' is already sorted or we sort both.
-    // For safety, let's assume caller (loadDashboardData) handles mapping correctly.
-    
+    // Prepare data arrays
     const labels = units.map(u => u.unitNumber);
     const data = units.map(u => u.totalContributed);
     const backgroundColors = units.map(u => u.isHighlighted ? 'rgba(255, 159, 64, 0.7)' : 'rgba(54, 162, 235, 0.7)');
     const borderColors = units.map(u => u.isHighlighted ? 'rgba(255, 159, 64, 1)' : 'rgba(54, 162, 235, 1)');
     const tickColors = units.map(u => u.isHighlighted ? 'orange' : '#666');
+    
+    // Handle Pending Data copy
+    let chartPending = [...pendingData];
+
+    // Append Unclaimed if > 0
+    if (unclaimedAmount > 0) {
+        labels.push("Unclaimed");
+        data.push(unclaimedAmount);
+        backgroundColors.push('rgba(108, 117, 125, 0.7)'); // Grey
+        borderColors.push('rgba(108, 117, 125, 1)');
+        tickColors.push('#6c757d');
+        chartPending.push(0); // No pending for unclaimed
+    }
 
     // Target Line Data (same value for all points)
-    const targetData = new Array(units.length).fill(target);
+    const targetData = new Array(labels.length).fill(target);
 
     // Dynamic Width Adjustment for Visualization
     // Always fit to container (remove scroll requirement)
@@ -319,7 +343,7 @@ function renderChart(units, target, pendingData = []) {
                 {
                     type: 'bar',
                     label: 'Pending Approval',
-                    data: pendingData,
+                    data: chartPending,
                     backgroundColor: 'rgba(200, 200, 200, 0.3)', // Lighter/Grey
                     borderColor: 'rgba(100, 100, 100, 0.8)',
                     borderWidth: {top: 2, right: 2, bottom: 0, left: 2}, // simulate dotted box approx
@@ -871,6 +895,54 @@ function bindThresholdManagement() {
             console.error(err);
             status.textContent = "Error saving settings.";
             status.style.color = "red";
+        }
+    });
+}
+
+// ADM-4 Unclaimed Funds Management
+function bindUnclaimedManagement() {
+    console.log("Binding Unclaimed Funds Management...");
+    const form = document.getElementById('unclaimed-form');
+    const input = document.getElementById('unclaimed-amount');
+    const status = document.getElementById('unclaimed-form-status');
+    
+    if (!form) return;
+
+    // Load initial value logic
+    window.db.collection('system').doc('stats').get().then(doc => {
+         if(doc.exists) {
+             const data = doc.data();
+             if (data.unclaimedAmount) {
+                 input.value = data.unclaimedAmount;
+             }
+         }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        status.textContent = "Saving...";
+        status.style.color = "blue";
+        
+        const val = parseFloat(input.value);
+        if (isNaN(val) || val < 0) {
+             status.textContent = "Invalid Amount.";
+             status.style.color = "red";
+             return;
+        }
+
+        try {
+             await window.db.collection('system').doc('stats').set({
+                 unclaimedAmount: val
+             }, { merge: true });
+             
+             status.textContent = "Saved!";
+             status.style.color = "green";
+             // Reload Dashboard to reflect changes
+             loadDashboardData();
+        } catch(err) {
+             console.error(err);
+             status.textContent = "Error saving.";
+             status.style.color = "red";
         }
     });
 }
