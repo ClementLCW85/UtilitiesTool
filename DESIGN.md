@@ -126,7 +126,7 @@ Represents specific calls for funds or levies.
 | **ADM-1** | **Unit Status Mgmt** | Admin interface to toggle Highlight status and edit Public Notes. | ✅ Available |
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
-| **ADM-4** | **Unclaimed Funds** | Manage floating unclaimed amounts and display as special unit in chart. | ⏳ Pending |
+| **ADM-4** | **Unclaimed Funds** | Manage floating unclaimed amounts and display as special unit in chart. | ✅ Available |
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
