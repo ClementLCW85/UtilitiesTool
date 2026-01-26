@@ -67,6 +67,15 @@
             <!-- Context Note -->
             <div style="text-align: center; margin: 10px 0 20px 0; color: #555;">
                 <p id="stats-context-msg" class="small-note">Loading context...</p>
+                
+                <!-- Unclaimed Detail View -->
+                <div id="dashboard-unclaimed-wrapper" style="display:none; margin-top: 10px;">
+                    <button id="toggle-dashboard-unclaimed" class="text-btn" style="font-size: 0.85rem;">Show Unclaimed Details</button>
+                    <div id="dashboard-unclaimed-details" style="display:none; text-align: left; margin: 10px auto; max-width: 500px; background: #fafafa; padding: 15px; border-radius: 6px; font-size: 0.9em; border: 1px solid #eee;">
+                        <strong>Current Unclaimed Records:</strong>
+                        <ul id="dashboard-unclaimed-list" style="padding-left: 20px; list-style-type: circle; margin-top: 5px;"></ul>
+                    </div>
+                </div>
             </div>
 
             <!-- 3. Active Round Widget -->
@@ -105,7 +114,7 @@
                     </div>
 
                     <p id="widget-round-remarks" class="round-remarks"></p>
-                    <p class="small-note">Includes payments since <span id="widget-round-start-date">-</span> from participating units.</p>
+                    <p class="small-note">Includes payments since <span id="widget-round-start-date">-</span> from participating units. (Does not include Unclaimed Records)</p>
                     
                     <div style="margin-top: 10px;">
                         <button id="widget-participant-toggle" class="text-btn" style="font-size: 0.85rem;">Show Participating Units</button>
