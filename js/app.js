@@ -1521,10 +1521,17 @@ async function loadLatestRound() {
         const targetEl = document.getElementById('round-target');
         if (targetEl) targetEl.innerText = formatCurrency(round.targetAmount);
 
-        // Determine Effective Start Date (start of previous round if exists)
+        // Determine Effective Start Date
         let effectiveStartDate = round.startDate;
+        
         if (snapshot.docs.length > 1) {
+             // If previous round exists, use its start date (accumulate from then)
              effectiveStartDate = snapshot.docs[1].data().startDate || round.startDate;
+        } else {
+             // If ONLY 1 round (First ever round), default to 6 months prior to this round's start
+             const d = new Date(round.startDate);
+             d.setMonth(d.getMonth() - 6);
+             effectiveStartDate = d.toISOString().split('T')[0];
         }
 
         const dateEl = document.getElementById('widget-round-start-date');
