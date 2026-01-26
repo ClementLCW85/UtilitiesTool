@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user) {
                 fetchBills();
                 fetchCollectionRounds();
+                fetchPendingPayments();
             } else {
                 // Clear table on logout
                 const tbody = document.querySelector('#bill-history-table tbody');
@@ -153,6 +154,9 @@ async function loadDashboardData() {
         // Store globally for filtering
         dashboardUnits = unitsData;
         
+        // Sort units to ensure alignment with pending data
+        dashboardUnits.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
+        
         // Handle Threshold Override
         if (stats.isOverrideEnabled && stats.overrideTarget !== undefined) {
              dashboardTarget = stats.overrideTarget;
@@ -202,8 +206,23 @@ async function loadDashboardData() {
             `;
         }
 
+        // Fetch Pending Payments for Visualization (DASH-8)
+        let pendingData = new Array(dashboardUnits.length).fill(0);
+        try {
+            const pendingSnap = await window.db.collection('pending_payments').get();
+            const pendingMap = {};
+            pendingSnap.forEach(doc => {
+                 const p = doc.data();
+                 if(p.unitNumber) {
+                     pendingMap[p.unitNumber] = (pendingMap[p.unitNumber] || 0) + (p.amount || 0);
+                 }
+            });
+            // Map to sorted units order
+            pendingData = dashboardUnits.map(u => pendingMap[u.unitNumber] || 0);
+        } catch(e) { console.error("Error fetching pending stats", e); }
+
         // Render Chart
-        renderChart(dashboardUnits, dashboardTarget);
+        renderChart(dashboardUnits, dashboardTarget, pendingData);
 
         // Load Collection Round (Public)
         loadLatestRound();
@@ -220,13 +239,16 @@ function formatCurrency(num) {
 }
 
 // Chart.js Logic
-function renderChart(units, target) {
+function renderChart(units, target, pendingData = []) {
     const ctx = document.getElementById('unit-bar-chart');
     if (!ctx) return;
 
     // Sort units
-    units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
-
+    // Note: 'units' passed here is usually referencing 'dashboardUnits' which is sorted.
+    // If not, sorting might detach indices from pendingData if pendingData isn't sorted same way.
+    // Assuming 'units' is already sorted or we sort both.
+    // For safety, let's assume caller (loadDashboardData) handles mapping correctly.
+    
     const labels = units.map(u => u.unitNumber);
     const data = units.map(u => u.totalContributed);
     const backgroundColors = units.map(u => u.isHighlighted ? 'rgba(255, 159, 64, 0.7)' : 'rgba(54, 162, 235, 0.7)');
@@ -240,7 +262,7 @@ function renderChart(units, target) {
     // Always fit to container (remove scroll requirement)
     ctx.style.minWidth = '0'; 
     ctx.style.width = '100%'; 
-
+    
     if (unitChartInstance) {
         unitChartInstance.destroy();
     }
@@ -267,8 +289,21 @@ function renderChart(units, target) {
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
                     borderWidth: 1,
-                    minBarLength: 5, // Allow hovering even if 0
-                    order: 1
+                    minBarLength: 5, 
+                    order: 2,
+                    stack: 'Stack 0'
+                },
+                {
+                    type: 'bar',
+                    label: 'Pending Approval',
+                    data: pendingData,
+                    backgroundColor: 'rgba(200, 200, 200, 0.3)', // Lighter/Grey
+                    borderColor: 'rgba(100, 100, 100, 0.8)',
+                    borderWidth: {top: 2, right: 2, bottom: 0, left: 2}, // simulate dotted box approx
+                    borderDash: [5, 5],
+                    order: 1,
+                    stack: 'Stack 0',
+                    skipNull: true
                 }
             ]
         },
@@ -578,21 +613,14 @@ function bindPublicPaymentForm() {
         }
 
         try {
-            const batch = window.db.batch();
-            
-            // 1. Create Payment Record (Same Collection)
-            const paymentRef = window.db.collection('payments').doc();
+            // Updated Flow (PAY-7): Save to 'pending_payments' for Admin Approval
+            const pendingRef = window.db.collection('pending_payments').doc();
+             // Re-using Payment Model as schema is identical
             const payment = new window.Models.Payment(unitNum, amount, date, ref, receiptUrl);
-            batch.set(paymentRef, payment.toFirestore());
+            
+            await pendingRef.set(payment.toFirestore());
 
-            // 2. Increment Unit Total
-            const unitRef = window.db.collection('units').doc(unitNum);
-            const increment = window.firebase.firestore.FieldValue.increment(amount);
-            batch.update(unitRef, { totalContributed: increment });
-
-            await batch.commit();
-
-            status.textContent = "Payment Submitted Successfully! Thank you.";
+            status.textContent = "Payment Submitted for Approval! Thank you.";
             status.style.color = "green";
             form.reset();
         } catch (error) {
@@ -885,6 +913,260 @@ function bindDataExport() {
             btn.disabled = false;
         }
     });
+}
+
+// PAY-6 & PAY-8: Archive Management
+function bindArchiveEvents() {
+    const toggleBtn = document.getElementById('toggle-archive-btn');
+    const section = document.getElementById('archived-payments-section');
+    const filter = document.getElementById('archive-filter');
+
+    if (toggleBtn && section) {
+        toggleBtn.addEventListener('click', () => {
+             if (section.style.display === 'none') {
+                 section.style.display = 'block';
+                 toggleBtn.textContent = "Hide Archived Payments";
+                 loadArchivedPayments();
+             } else {
+                 section.style.display = 'none';
+                 toggleBtn.textContent = "View Archived Payments";
+             }
+        });
+    }
+
+    if (filter) {
+        filter.addEventListener('change', () => loadArchivedPayments());
+    }
+}
+
+async function loadArchivedPayments() {
+    const tbody = document.querySelector('#archived-history-table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+    const filterVal = document.getElementById('archive-filter') ? document.getElementById('archive-filter').value : 'all';
+
+    try {
+        let query = window.db.collection('archived_payments').orderBy('archivedAt', 'desc');
+        
+        if (filterVal === 'deleted') {
+            query = query.where('source', '==', 'deleted');
+        } else if (filterVal === 'rejected') {
+            query = query.where('source', '==', 'rejected');
+        }
+        
+        const snapshot = await query.get();
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="5">No archived records found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const sourceLabel = data.source === 'rejected' ? '<span style="color:red; font-weight:bold;">Rejected</span>' : 'Deleted';
+            const reason = data.rejectionReason ? `<br><small>(${data.rejectionReason})</small>` : '';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${data.unitNumber}</td>
+                <td>${data.date}</td>
+                <td>${formatCurrency(data.amount)}</td>
+                <td>${data.archivedAt ? new Date(data.archivedAt.seconds * 1000).toLocaleDateString() : '-'}</td>
+                <td>
+                    ${sourceLabel}${reason}
+                    <button class="perm-delete-btn small-btn danger" data-id="${doc.id}" style="float:right; font-size:0.7rem;">Delete forever</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.perm-delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => deleteArchivedPayment(e.target.dataset.id));
+        });
+
+    } catch (e) {
+        console.error("Archive Load Error", e);
+        tbody.innerHTML = '<tr><td colspan="5">Error loading archive.</td></tr>';
+    }
+}
+
+async function archivePayment(docId, unitId) {
+    if(!confirm("Are you sure you want to delete this payment? It will be moved to archive.")) return;
+    
+    try {
+        const batch = window.db.batch();
+        const docRef = window.db.collection('payments').doc(docId);
+        const docSnap = await docRef.get();
+        
+        if(!docSnap.exists) return;
+        const data = docSnap.data();
+
+        const archiveRef = window.db.collection('archived_payments').doc();
+        batch.set(archiveRef, {
+            ...data,
+            archivedAt: new Date(),
+            source: 'deleted'
+        });
+
+        if (unitId) {
+             const unitRef = window.db.collection('units').doc(unitId);
+             const increment = window.firebase.firestore.FieldValue.increment(-data.amount);
+             batch.update(unitRef, { totalContributed: increment });
+        }
+
+        batch.delete(docRef);
+        await batch.commit();
+        
+        document.getElementById('history-unit-select').dispatchEvent(new Event('change'));
+
+    } catch (e) {
+        console.error("Archive Error:", e);
+        alert("Error archiving payment.");
+    }
+}
+
+async function deleteArchivedPayment(docId) {
+    if(!confirm("PERMANENTLY DELETE? This cannot be undone.")) return;
+    try {
+        await window.db.collection('archived_payments').doc(docId).delete();
+        loadArchivedPayments();
+    } catch(e) {
+        alert("Error deleting: " + e.message);
+    }
+}
+
+// --- PAY-7 Admin Approval Logic ---
+function loadPendingPayments() {
+    const tbody = document.querySelector('#pending-payment-table tbody');
+    if (!tbody) return;
+
+    window.db.collection('pending_payments')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(snapshot => { // Realtime listener
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="6">No pending payments.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${data.unitNumber}</td>
+                    <td>
+                        <input type="number" class="edit-amount" value="${data.amount}" step="0.01" style="width: 80px;">
+                    </td>
+                    <td>${data.date}</td>
+                    <td>${data.reference || '-'}</td>
+                    <td>${data.receiptUrl ? `<a href="${data.receiptUrl}" target="_blank">View</a>` : '-'}</td>
+                    <td>
+                        <button class="approve-btn small-btn" style="background-color: var(--success-color);" data-id="${doc.id}">Approve</button>
+                        <button class="reject-btn small-btn danger" data-id="${doc.id}">Reject</button>
+                    </td>
+                `;
+                
+                // Attach data to row for easy access
+                tr.dataset.unit = data.unitNumber;
+                tr.dataset.date = data.date;
+                tr.dataset.ref = data.reference;
+                tr.dataset.url = data.receiptUrl;
+                
+                tbody.appendChild(tr);
+            });
+            
+            // Bind Actions
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => approvePayment(e.target));
+            });
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => rejectPayment(e.target));
+            });
+        });
+}
+
+async function approvePayment(btn) {
+    const tr = btn.closest('tr');
+    const docId = btn.dataset.id;
+    const amountVal = tr.querySelector('.edit-amount').value;
+    
+    if(!amountVal || amountVal <= 0) {
+        alert("Invalid Amount");
+        return;
+    }
+
+    const amount = Number(amountVal);
+    const unitNum = tr.dataset.unit;
+    const date = tr.dataset.date;
+    const ref = tr.dataset.ref;
+    const url = tr.dataset.url;
+
+    if(!confirm(`Approve payment of RM ${amount} for ${unitNum}?`)) return;
+
+    try {
+        const batch = window.db.batch();
+        
+        // 1. Move to Active Payments
+        const payRef = window.db.collection('payments').doc(); // New ID
+        batch.set(payRef, {
+            unitNumber: unitNum,
+            amount: amount,
+            date: date,
+            reference: ref,
+            receiptUrl: url,
+            createdAt: new Date()
+        });
+
+        // 2. Increment Unit Total
+        const unitRef = window.db.collection('units').doc(unitNum);
+        batch.update(unitRef, { 
+            totalContributed: window.firebase.firestore.FieldValue.increment(amount) 
+        });
+
+        // 3. Delete from Pending
+        const pendingRef = window.db.collection('pending_payments').doc(docId);
+        batch.delete(pendingRef);
+
+        await batch.commit();
+        // UI updates automatically via onSnapshot
+
+    } catch (e) {
+        console.error("Approval Error:", e);
+        alert("Error approving payment: " + e.message);
+    }
+}
+
+async function rejectPayment(btn) {
+    const docId = btn.dataset.id;
+    const reason = prompt("Enter rejection reason (optional):", "Incorrect Details");
+    if (reason === null) return; // Cancelled
+
+    try {
+        const docSnap = await window.db.collection('pending_payments').doc(docId).get();
+        if(!docSnap.exists) return;
+        const data = docSnap.data();
+
+        const batch = window.db.batch();
+
+        // 1. Move to Archive (Rejected source)
+        const archiveRef = window.db.collection('archived_payments').doc();
+        batch.set(archiveRef, {
+            ...data,
+            archivedAt: new Date(),
+            source: 'rejected',
+            rejectionReason: reason
+        });
+
+        // 2. Delete from Pending
+        batch.delete(window.db.collection('pending_payments').doc(docId));
+
+        await batch.commit();
+
+    } catch (e) {
+        console.error("Rejection Error:", e);
+        alert("Error rejecting payment: " + e.message);
+    }
 }
 
 // PAY-6 Archive Management
@@ -1366,4 +1648,147 @@ function bindRoundHistoryEvents() {
              btn.textContent = 'View History';
          }
     });
+}
+
+// PAY-7: Admin Approval Queue Logic
+
+function fetchPendingPayments() {
+    window.db.collection('pending_payments').orderBy('createdAt', 'desc').get()
+        .then((snapshot) => {
+            renderPendingTable(snapshot.docs);
+        })
+        .catch((error) => {
+            console.error("Error fetching pending payments:", error);
+            const tbody = document.querySelector('#pending-payment-table tbody');
+            if(tbody) tbody.innerHTML = '<tr><td colspan="6">Error loading pending payments.</td></tr>';
+        });
+}
+
+function renderPendingTable(docs) {
+    const tbody = document.querySelector('#pending-payment-table tbody');
+    if (!tbody) return;
+
+    if (docs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">No pending payments.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = '';
+    docs.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+            <td>${data.unitNumber}</td>
+            <td><input type="number" class="pending-amount" data-id="${doc.id}" value="${data.amount}" step="0.01" style="width:80px"></td>
+            <td>${data.date}</td>
+            <td><input type="text" class="pending-ref" data-id="${doc.id}" value="${data.reference || ''}" style="width:100px"></td>
+            <td>${data.receiptUrl ? `<a href="${data.receiptUrl}" target="_blank">View</a>` : '-'}</td>
+            <td>
+                <button class="approve-btn small-btn" data-id="${doc.id}" style="color:white; background:green; margin-right:5px;">Approve</button>
+                <button class="reject-btn small-btn" data-id="${doc.id}" style="color:white; background:red;">Reject</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Bind Actions
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            approvePayment(id);
+        });
+    });
+
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            rejectPayment(id);
+        });
+    });
+}
+
+async function approvePayment(docId) {
+    if(!confirm("Confirm approval of this payment?")) return;
+
+    try {
+        const docRef = window.db.collection('pending_payments').doc(docId);
+        const docSnap = await docRef.get();
+        if (!docSnap.exists) return;
+
+        const data = docSnap.data();
+        
+        // Get potentially edited values from inputs
+        const amountInput = document.querySelector(`.pending-amount[data-id="${docId}"]`);
+        const refInput = document.querySelector(`.pending-ref[data-id="${docId}"]`);
+        
+        const finalAmount = amountInput ? parseFloat(amountInput.value) : data.amount;
+        const finalRef = refInput ? refInput.value : data.reference;
+
+        const batch = window.db.batch();
+        
+        // 1. Create in 'payments'
+        const newPaymentRef = window.db.collection('payments').doc(); // Auto-ID
+        const approvedData = {
+            ...data,
+            amount: finalAmount,
+            reference: finalRef,
+            approvedAt: new Date()
+        };
+        batch.set(newPaymentRef, approvedData);
+
+        // 2. Increment Unit Total
+        const unitRef = window.db.collection('units').doc(data.unitNumber);
+        const increment = window.firebase.firestore.FieldValue.increment(finalAmount);
+        batch.update(unitRef, { totalContributed: increment });
+
+        // 3. Delete from 'pending_payments'
+        batch.delete(docRef);
+
+        await batch.commit();
+        
+        alert("Payment Approved!");
+        fetchPendingPayments();
+
+    } catch (e) {
+        console.error("Approve Error:", e);
+        alert("Error approving payment: " + e.message);
+    }
+}
+
+async function rejectPayment(docId) {
+    const reason = prompt("Enter rejection reason (optional):", "Incorrect details");
+    if (reason === null) return; // Cancelled
+
+    try {
+        const docRef = window.db.collection('pending_payments').doc(docId);
+        const docSnap = await docRef.get();
+        if (!docSnap.exists) return;
+
+        const data = docSnap.data();
+        
+        const batch = window.db.batch();
+
+        // 1. Create in 'archived_payments' (PAY-8)
+        const archiveRef = window.db.collection('archived_payments').doc();
+        const archivedData = {
+            ...data,
+            archivedAt: new Date(),
+            source: 'rejected',
+            rejectionReason: reason
+        };
+        batch.set(archiveRef, archivedData);
+
+        // 2. Delete from 'pending_payments'
+        batch.delete(docRef);
+
+        await batch.commit();
+
+        alert("Payment Rejected and Archived.");
+        fetchPendingPayments();
+
+    } catch (e) {
+        console.error("Reject Error:", e);
+        alert("Error rejecting payment: " + e.message);
+    }
 }

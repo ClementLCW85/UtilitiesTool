@@ -90,6 +90,8 @@ class ArchivedPayment extends Payment {
         }
         this.originalId = paymentData.id || "unknown";
         this.archivedAt = new Date();
+        this.source = paymentData.source || 'deleted';
+        this.rejectionReason = paymentData.rejectionReason || '';
     }
 
     toFirestore() {
@@ -98,6 +100,8 @@ class ArchivedPayment extends Payment {
         data.originalId = this.originalId;
         // Apply original createdAt to preserve history
         data.createdAt = this.createdAt;
+        data.source = this.source;
+        data.rejectionReason = this.rejectionReason;
         return data;
     }
 }

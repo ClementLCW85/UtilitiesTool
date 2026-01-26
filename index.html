@@ -155,6 +155,7 @@
                             <p class="small-note">Please contact admin if your upload fails.</p>
                         </div>
                         <button type="submit">Submit Payment</button>
+                        <p class="small-note">Note: Submissions will be reviewed by Admin before appearing on dashboard.</p>
                         <p id="public-payment-status" class="small-note" style="margin-top: 10px;"></p>
                     </fieldset>
                 </form>
@@ -245,6 +246,28 @@
                         </div>
                         <span id="bill-history-status" class="small-note"></span>
                     </section>
+                    <hr>
+                    <section id="payment-approval-section">
+                        <h3>Pending Payment Approvals</h3>
+                         <div class="table-wrapper">
+                            <table id="pending-payment-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Unit</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Ref</th>
+                                        <th>Receipt</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
                     <p id="payment-placeholder" style="display:none;">Select an action below (Pending Implementation in PAY-1)</p>
                     <div class="admin-actions" style="display:none;">
                         <button disabled>Record Payment</button>
@@ -316,6 +339,14 @@
 
                     <section id="archived-payments-section" style="display:none; margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
                         <h3>Archived Payments (Trash)</h3>
+                        <div style="margin-bottom: 10px;">
+                            <label for="archive-filter">Filter Source:</label>
+                            <select id="archive-filter">
+                                <option value="all">All Records</option>
+                                <option value="deleted">Manually Deleted</option>
+                                <option value="rejected">Rejected Submissions</option>
+                            </select>
+                        </div>
                         <p class="small-note">Records here are excluded from all totals.</p>
                         <div class="table-wrapper">
                             <table id="archived-history-table">
