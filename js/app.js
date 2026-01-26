@@ -165,7 +165,11 @@ async function loadDashboardData() {
         // 1. Fetch Global Stats (Total Bills)
         const statsDoc = await window.db.collection('system').doc('stats').get();
         const stats = statsDoc.exists ? statsDoc.data() : { totalBillsAmount: 0, unitTarget: 0 };
-        const unclaimed = stats.unclaimedAmount || 0;
+        
+        // Calculate Unclaimed from Collection
+        let unclaimed = 0;
+        const unclaimedSnap = await window.db.collection('unclaimed_records').get();
+        unclaimedSnap.forEach(doc => unclaimed += (doc.data().amount || 0));
         
         // 2. Fetch All Units (Total Collected)
         const unitsSnapshot = await window.db.collection('units').get();
@@ -899,52 +903,302 @@ function bindThresholdManagement() {
     });
 }
 
-// ADM-4 Unclaimed Funds Management
+// ADM-5 Detailed Unclaimed Funds Management
 function bindUnclaimedManagement() {
     console.log("Binding Unclaimed Funds Management...");
     const form = document.getElementById('unclaimed-form');
-    const input = document.getElementById('unclaimed-amount');
     const status = document.getElementById('unclaimed-form-status');
+    // Archive Toggle
+    const archiveBtn = document.getElementById('toggle-unclaimed-archive');
+    const archiveContainer = document.getElementById('unclaimed-archive-container');
     
-    if (!form) return;
+    // Initial Load
+    fetchUnclaimedRecords();
 
-    // Load initial value logic
-    window.db.collection('system').doc('stats').get().then(doc => {
-         if(doc.exists) {
-             const data = doc.data();
-             if (data.unclaimedAmount) {
-                 input.value = data.unclaimedAmount;
-             }
-         }
-    });
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            status.textContent = "Saving...";
+            status.style.color = "blue";
+            
+            const date = document.getElementById('unclaimed-date').value;
+            const amount = document.getElementById('unclaimed-amount').value;
+            const remarks = document.getElementById('unclaimed-remarks').value;
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        status.textContent = "Saving...";
-        status.style.color = "blue";
+            try {
+                 const record = new window.Models.UnclaimedRecord(date, amount, remarks);
+                 await window.db.collection('unclaimed_records').add(record.toFirestore());
+                 
+                 status.textContent = "Saved!";
+                 status.style.color = "green";
+                 form.reset();
+                 fetchUnclaimedRecords();
+                 loadDashboardData();
+            } catch(err) {
+                 console.error(err);
+                 status.textContent = "Error saving.";
+                 status.style.color = "red";
+            }
+        });
+    }
+
+    if (archiveBtn && archiveContainer) {
+        archiveBtn.addEventListener('click', () => {
+            if (archiveContainer.style.display === 'none') {
+                archiveContainer.style.display = 'block';
+                archiveBtn.textContent = 'Hide Archived Unclaimed';
+                fetchArchivedUnclaimed();
+            } else {
+                archiveContainer.style.display = 'none';
+                archiveBtn.textContent = 'View Archived Unclaimed';
+            }
+        });
+    }
+
+    bindConversionModal();
+}
+
+async function fetchUnclaimedRecords() {
+    const tbody = document.querySelector('#unclaimed-table tbody');
+    if (!tbody) return;
+
+    try {
+        const snapshot = await window.db.collection('unclaimed_records').orderBy('date', 'desc').get();
+        tbody.innerHTML = '';
+
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="4">No active unclaimed funds.</td></tr>';
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${data.date}</td>
+                <td>${formatCurrency(data.amount)}</td>
+                <td>${data.remarks}</td>
+                <td>
+                    <button class="convert-btn small-btn" style="background:var(--success-color);" data-id="${doc.id}">Convert</button>
+                    <button class="archive-unclaimed-btn small-btn danger" data-id="${doc.id}">Delete</button>
+                </td>
+            `;
+            // Attach data for converting
+            tr.dataset.amount = data.amount;
+            tr.dataset.date = data.date;
+            tr.dataset.remarks = data.remarks;
+            
+            tbody.appendChild(tr);
+        });
+
+        // Bind Actions
+        document.querySelectorAll('.convert-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => openConversionModal(e.target));
+        });
+        document.querySelectorAll('.archive-unclaimed-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => archiveUnclaimedRecord(e.target.dataset.id, 'deleted'));
+        });
+
+    } catch (e) {
+        console.error("Error loading unclaimed", e);
+    }
+}
+
+async function fetchArchivedUnclaimed() {
+    const tbody = document.querySelector('#unclaimed-archive-table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+    try {
+        const snapshot = await window.db.collection('archived_unclaimed').orderBy('archivedAt', 'desc').get();
+        tbody.innerHTML = '';
         
-        const val = parseFloat(input.value);
-        if (isNaN(val) || val < 0) {
-             status.textContent = "Invalid Amount.";
-             status.style.color = "red";
-             return;
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="5">No archived records.</td></tr>';
+            return;
         }
 
-        try {
-             await window.db.collection('system').doc('stats').set({
-                 unclaimedAmount: val
-             }, { merge: true });
-             
-             status.textContent = "Saved!";
-             status.style.color = "green";
-             // Reload Dashboard to reflect changes
-             loadDashboardData();
-        } catch(err) {
-             console.error(err);
-             status.textContent = "Error saving.";
-             status.style.color = "red";
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const archivedDate = data.archivedAt && data.archivedAt.toDate ? data.archivedAt.toDate().toLocaleDateString() : '-';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${data.date}</td>
+                <td>${formatCurrency(data.amount)}</td>
+                <td>${data.remarks}</td>
+                <td>${archivedDate}</td>
+                <td>${data.status}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch(e) {
+        console.error("Archive fetch error", e);
+    }
+}
+
+async function archiveUnclaimedRecord(id, statusType, additionalData = {}) {
+    if (statusType === 'deleted' && !confirm("Are you sure? This removes it from the total collected.")) return;
+
+    try {
+        const docRef = window.db.collection('unclaimed_records').doc(id);
+        const docSnap = await docRef.get();
+        if (!docSnap.exists) return;
+        const data = docSnap.data();
+
+        const batch = window.db.batch();
+        
+        // Add to Archive
+        const archiveRef = window.db.collection('archived_unclaimed').doc();
+        batch.set(archiveRef, {
+            ...data,
+            archivedAt: new Date(),
+            status: statusType,
+            ...additionalData
+        });
+
+        // Delete Original
+        batch.delete(docRef);
+
+        // Commit (Note: Conversion logic handles its own batch, so this is for DELETE only usually)
+        if (statusType === 'deleted') {
+            await batch.commit();
+            fetchUnclaimedRecords();
+            loadDashboardData();
+        } else {
+            // Return instructions for larger transaction if needed, but for now we separate concerns
+            // Actually, for conversion we want an atomic transaction.
+            // So this helper might be just for deletion.
+            // Let's keep it simple: Archive Only.
         }
-    });
+
+    } catch(e) {
+        console.error("Archive error:", e);
+    }
+}
+
+
+// Conversion Logic
+let conversionTargetId = null;
+
+function bindConversionModal() {
+    const modal = document.getElementById('convert-modal');
+    const close = document.getElementById('close-convert-modal');
+    const form = document.getElementById('convert-form');
+    
+    // Populate Unit Dropdown in Modal
+    const select = document.getElementById('convert-unit');
+    // Reuse existing logic manually since populateUnitDropdown is generic
+    if(select) {
+        select.innerHTML = '<option value="">--Select Unit--</option>';
+        for (let i = 0; i < 44; i++) {
+             const unitId = window.Models.SchemaService.formatUnitId(i);
+             const option = document.createElement('option');
+             option.value = unitId;
+             option.textContent = unitId;
+             select.appendChild(option);
+        }
+    }
+
+    if(close) {
+        close.addEventListener('click', () => {
+             modal.style.display = "none";
+             conversionTargetId = null;
+        });
+    }
+
+    if(form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!conversionTargetId) return;
+
+            const unitNum = document.getElementById('convert-unit').value;
+            const fileInput = document.getElementById('convert-receipt');
+            const amount = parseFloat(document.getElementById('convert-amount-hidden').value);
+            const date = document.getElementById('convert-display-date').innerText; // Using display, safe enough for this context
+            const remarks = document.getElementById('convert-display-remarks').innerText;
+
+            if(!unitNum) { alert("Select a unit."); return; }
+
+            // Handle Upload
+            let receiptUrl = "";
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                if(fileInput.files.length > 0) {
+                     if (!window.DriveService) throw new Error("Drive Service missing");
+                     receiptUrl = await window.DriveService.uploadFile(fileInput.files[0]);
+                }
+
+                // Transaction: Create Payment + Increment Unit + Move Unclaimed
+                const batch = window.db.batch();
+                
+                // 1. Create Payment
+                const payRef = window.db.collection('payments').doc();
+                const payment = new window.Models.Payment(unitNum, amount, date, `Converted: ${remarks}`, receiptUrl);
+                batch.set(payRef, payment.toFirestore());
+
+                // 2. Increment Unit
+                const unitRef = window.db.collection('units').doc(unitNum);
+                batch.update(unitRef, { totalContributed: window.firebase.firestore.FieldValue.increment(amount) });
+
+                // 3. Move Unclaimed to Archive
+                // We need to fetch the original doc data again to be safe or pass it. 
+                // Fetching inside this flow for simplicity (optimistic UI used earlier)
+                const uncRef = window.db.collection('unclaimed_records').doc(conversionTargetId);
+                const uncSnap = await uncRef.get();
+                if(uncSnap.exists) {
+                    const uncData = uncSnap.data();
+                    const archiveRef = window.db.collection('archived_unclaimed').doc();
+                    batch.set(archiveRef, {
+                        ...uncData,
+                        archivedAt: new Date(),
+                        status: 'converted',
+                        convertedPaymentId: payRef.id
+                    });
+                    
+                    // 4. Delete Unclaimed
+                    batch.delete(uncRef);
+                }
+
+                await batch.commit();
+                
+                alert("Converted Successfully!");
+                modal.style.display = "none";
+                form.reset();
+                fetchUnclaimedRecords();
+                loadDashboardData();
+
+            } catch (err) {
+                console.error("Conversion Error:", err);
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        });
+    }
+}
+
+function openConversionModal(btn) {
+    const tr = btn.closest('tr');
+    const id = btn.dataset.id;
+    const amount = tr.dataset.amount;
+    const date = tr.dataset.date;
+    const remarks = tr.dataset.remarks;
+
+    conversionTargetId = id;
+    document.getElementById('convert-id').value = id;
+    document.getElementById('convert-amount-hidden').value = amount;
+    
+    document.getElementById('convert-display-amount').innerText = formatCurrency(parseFloat(amount)).replace('RM ', '');
+    document.getElementById('convert-display-date').innerText = date;
+    document.getElementById('convert-display-remarks').innerText = remarks;
+
+    const modal = document.getElementById('convert-modal');
+    modal.style.display = "block";
 }
 
 // ADM-3 Data Export

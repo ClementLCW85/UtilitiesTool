@@ -146,6 +146,24 @@ class CollectionRound {
     }
 }
 
+class UnclaimedRecord {
+    constructor(date, amount, remarks) {
+        this.date = date; // YYYY-MM-DD
+        this.amount = Number(amount);
+        this.remarks = remarks;
+        this.createdAt = new Date();
+    }
+
+    toFirestore() {
+        return {
+            date: this.date,
+            amount: this.amount,
+            remarks: this.remarks,
+            createdAt: this.createdAt
+        };
+    }
+}
+
 // Service to help with Data Management
 const SchemaService = {
     // Generate standard Unit ID string (E-101 to E-111, E-201 to E-211, etc.)
@@ -242,5 +260,6 @@ window.Models = {
     Payment,
     ArchivedPayment,
     CollectionRound,
+    UnclaimedRecord,
     SchemaService
 };

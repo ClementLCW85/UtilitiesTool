@@ -56,6 +56,7 @@
 | ADM-2 | Manual Threshold Override | Option for Admin to manually set the Threshold Line value (overriding the auto-sum) if needed for adjustments. | Low | DASH-3 |
 | ADM-3 | Data Export | Button to download current state (bills/payments) as JSON/CSV for backup. | Low | BILL-1, PAY-1 |
 | ADM-4 | Unclaimed Funds Management | Admin interface to set a floating "Unclaimed" amount (payments not linked to units). visualized as a special unit in Dashboard. | High | ADM-2 |
+| ADM-5 | Detailed Unclaimed Funds | Enhancement to ADM-4. Track unclaimed funds as individual records (Date, Amount, Remarks). Allow conversion to valid Unit Payment or Archiving. | High | ADM-4 |
 
 ## 6. Epic: Collection Rounds Management
 **Goal:** Manage and visualize specific fundraising rounds.
