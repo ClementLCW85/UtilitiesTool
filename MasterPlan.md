@@ -77,6 +77,8 @@ Updates to this document should happen after completing each user story.
 - *Status:* Completed. Admin interface to manage floating amounts and visualization in Dashboard.
 - [x] **ADM-5** Detailed Unclaimed Funds
 - *Status:* Completed. Transition `unclaimedAmount` to collection-based tracking with Conversion/Archive features.
+- [x] **ADM-6** Admin UI Segmentation
+    - *Status:* Completed. Implemented tabbed navigation for Admin sections.
 
 ### 6. Epic: Collection Rounds Management
 - [x] **COL-1** Define Collection Round

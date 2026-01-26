@@ -58,6 +58,7 @@
 | ADM-3 | Data Export | Button to download current state (bills/payments) as JSON/CSV for backup. | Low | BILL-1, PAY-1 |
 | ADM-4 | Unclaimed Funds Management | Admin interface to set a floating "Unclaimed" amount (payments not linked to units). visualized as a special unit in Dashboard. | High | ADM-2 |
 | ADM-5 | Detailed Unclaimed Funds | Enhancement to ADM-4. Track unclaimed funds as individual records (Date, Amount, Remarks). Allow conversion to valid Unit Payment or Archiving. | High | ADM-4 |
+| ADM-6 | Admin UI Segmentation | Reorganize Admin Dashboard into tabbed sections (Bills, Payments, Unclaimed, Units, System) to reduce scrolling. | Medium | INF-3 |
 
 ## 6. Epic: Collection Rounds Management
 **Goal:** Manage and visualize specific fundraising rounds.
