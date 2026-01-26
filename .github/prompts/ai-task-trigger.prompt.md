@@ -14,4 +14,8 @@
 3. Ensure implementation details align with `DESIGN.md`.
 4. Follow the workflow rules in `INSTRUCTION.md` (e.g., updating feature logs).
 5. Generate a plan and proceed with implementation using the best available planning and reasoning LLM model.
+6. Upon completion:
+   - Mark the task as `Completed` in `MasterPlan.md`.
+   - Update the `Active Task` and `Next Priority` fields.
+   - Commit the changes (including `MasterPlan.md`).
 
