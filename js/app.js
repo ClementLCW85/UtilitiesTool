@@ -114,6 +114,29 @@ targets.forEach(id => {
     });
 }
 
+// Migration Helper (One-time use)
+window.fixArchivedSource = async function() {
+    console.log("Starting Migration: Backfill 'source' on archived_payments...");
+    const snap = await window.db.collection('archived_payments').get();
+    let count = 0;
+    const batch = window.db.batch();
+    
+    snap.forEach(doc => {
+        const data = doc.data();
+        if (!data.source) {
+            batch.update(doc.ref, { source: 'deleted' }); // Default for old records
+            count++;
+        }
+    });
+    
+    if (count > 0) {
+        await batch.commit();
+        console.log(`Fixed ${count} records. Please refresh page.`);
+    } else {
+        console.log("No records needed fixing.");
+    }
+};
+
 function handleNavigation() {
     const hash = window.location.hash || '#dashboard';
     const sections = document.querySelectorAll('.view-section');
@@ -947,7 +970,9 @@ async function loadArchivedPayments() {
     const filterVal = document.getElementById('archive-filter') ? document.getElementById('archive-filter').value : 'all';
 
     try {
-        let query = window.db.collection('archived_payments').orderBy('archivedAt', 'desc');
+        // Fix BloomFilter Error: Remove backend orderBy when combining with where
+        // Perform Client-Side sorting instead
+        let query = window.db.collection('archived_payments');
         
         if (filterVal === 'deleted') {
             query = query.where('source', '==', 'deleted');
@@ -962,8 +987,19 @@ async function loadArchivedPayments() {
         }
 
         tbody.innerHTML = '';
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        
+        // Convert to array and sort manually
+        const docs = [];
+        snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+        
+        // Sort DESC by archivedAt
+        docs.sort((a, b) => {
+            const timeA = a.archivedAt ? a.archivedAt.seconds : 0;
+            const timeB = b.archivedAt ? b.archivedAt.seconds : 0;
+            return timeB - timeA;
+        });
+
+        docs.forEach(data => {
             const sourceLabel = data.source === 'rejected' ? '<span style="color:red; font-weight:bold;">Rejected</span>' : 'Deleted';
             const reason = data.rejectionReason ? `<br><small>(${data.rejectionReason})</small>` : '';
 
@@ -975,7 +1011,7 @@ async function loadArchivedPayments() {
                 <td>${data.archivedAt ? new Date(data.archivedAt.seconds * 1000).toLocaleDateString() : '-'}</td>
                 <td>
                     ${sourceLabel}${reason}
-                    <button class="perm-delete-btn small-btn danger" data-id="${doc.id}" style="float:right; font-size:0.7rem;">Delete forever</button>
+                    <button class="perm-delete-btn small-btn danger" data-id="${data.id}" style="float:right; font-size:0.7rem;">Delete forever</button>
                 </td>
             `;
             tbody.appendChild(tr);
