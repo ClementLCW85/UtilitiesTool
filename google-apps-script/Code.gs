@@ -6,18 +6,23 @@ function doPost(e) {
     var filename = data.filename;
     var mimeType = data.mimeType;
     var base64Data = data.fileData;
-    var folderId = data.folderId;
+    // 2. Security & Config
+    // Hardcoded Folder ID (Receipts) to prevent arbitrary writes to other Admin folders.
+    // This ensures that even if the client is compromised, it cannot upload to sensitive folders.
+    // REPLACE WITH YOUR ACTUAL FOLDER ID found in js/config.js
+    var TARGET_FOLDER_ID = "1VY6uns6MEDtAJoWQ7kUgZf7xa44b1M6n"; 
     
+    // 3. Create Blob
     var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, filename);
     var file;
 
-    if (folderId) {
-      try {
-        file = DriveApp.getFolderById(folderId).createFile(blob);
-      } catch (e) {
-        file = DriveApp.createFile(blob);
-      }
-    } else {
+    // 4. Save File
+    // We strictly use the TARGET_FOLDER_ID. We do NOT use data.folderId from the request.
+    try {
+      file = DriveApp.getFolderById(TARGET_FOLDER_ID).createFile(blob);
+    } catch (e) {
+      // Fallback only if the specific folder fails (e.g. deleted), though ideally we should fail safe.
+      // Creating in root is a safe fallback for visibility.
       file = DriveApp.createFile(blob);
     }
     

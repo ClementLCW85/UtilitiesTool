@@ -71,6 +71,10 @@ const DriveService = {
         if (!file) throw new Error("No file provided.");
 
         try {
+            // SECURITY NOTE:
+            // logic uses 'drive.file' scope (configured in config.js).
+            // This ensures the user can ONLY see/edit files created by this app.
+            // They cannot access the Admin's Drive or other User's files.
             const token = await this.getAccessToken();
             
             // Prepare FormData for Multipart Upload
@@ -108,6 +112,7 @@ const DriveService = {
     /**
      * Uploads to Admin Drive via Google Apps Script Proxy.
      * Does NOT require user Google Login.
+     * SECURITY NOTE: The backend script is "Write-Only". It creates files but exposes no method to list or read other files.
      */
     uploadViaProxy: async function(file) {
         if (!file) throw new Error("No file provided.");
