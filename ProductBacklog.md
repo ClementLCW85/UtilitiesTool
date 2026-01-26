@@ -30,6 +30,8 @@
 | PAY-4 | Public Payment Submission | Interface for residents to submit payment records and upload receipts. | High | PAY-2 |
 | PAY-5 | Seamless Public Upload (GAS Proxy) | Implement Google Apps Script proxy to allow public uploads without user Google Auth. | High | PAY-4 |
 | PAY-6 | Payment Removal & Archiving | Admin capability to archive records (remove from totals) and permanently delete them from archive. | High | PAY-1 |
+| PAY-7 | Admin Approval Queue | Admin UI to view "Pending" public payments. Features: Edit Amount/Ref, Approve (Move to Active), Reject (Move to Archive). | High | PAY-4 |
+| PAY-8 | Rejected Payment Archiving | Store rejected payments in `archived_payments` with a specific flag. Admin can filter Archive view to see "Rejected" vs "Deleted". | Medium | PAY-7, PAY-6 |
 
 ## 4. Epic: Public Dashboard & Visualization
 **Goal:** Transparently display contributions and status to all users.
@@ -43,6 +45,7 @@
 | DASH-5 | Mobile Responsiveness | Ensure chart and data tables are readable on mobile devices. | Medium | DASH-1 |
 | DASH-6 | Chart Enhancements | Add "Contributions per Unit" title, Axis Titles (Y: RM, X: Units), and enable Public Note tooltip on X-axis labels. | Medium | DASH-2 |
 | DASH-7 | Layout & Context | Move Chart to Top. Add text explaining "Beginning Date" and cumulative nature of stats. | High | DASH-1 |
+| DASH-8 | Pending Payment Visualization | Update Bar Chart to show Pending Payments as a stacked, dotted/lighter bar segment on top of confirmed contributions. | High | DASH-2, PAY-7 |
 
 ## 5. Epic: Unit & System Administration
 **Goal:** Manage unit status and system configuration.

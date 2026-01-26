@@ -47,10 +47,16 @@ Represents individual payments made by owners.
 - `receiptUrl` (String): Link to proof of payment (optional).
 - `createdAt` (Timestamp).
 
+### Collection: `pending_payments`
+Stores public submissions awaiting Admin approval.
+- Same schema as `payments`.
+
 ### Collection: `archived_payments`
-Stores payments that were removed from the active ledger.
+Stores payments that were removed from the active ledger OR rejected.
 - Same schema as `payments`, plus:
 - `archivedAt` (Timestamp).
+- `source`: "deleted" (from active) or "rejected" (from pending).
+- `rejectionReason` (String): If source is rejected.
 
 ### Collection: `system`
 Stores global aggregates.
@@ -95,7 +101,8 @@ Represents specific calls for funds or levies.
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
 -   **Bill Recording:** Admin validates form -> Saves `Bill` -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
 -   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
--   **Public Submission:** Resident selects Unit -> Input Amount -> Selects File -> App POSTs Base64 data to GAS Web App -> GAS saves to Admin Drive -> Returns URL -> App writes to Firestore.
+-   **Public Submission:** Resident selects Unit -> Input Amount -> Selects File -> App POSTs Base64 data to GAS Web App -> GAS saves to Admin Drive -> Returns URL -> App writes to `pending_payments` collection.
+-   **Admin Approval:** Admin reviews `pending_payments` -> Modifies/Approves (Moves to `payments`, increments `Unit.total`) OR Rejects (Moves to `archived_payments` marked as "rejected").
 
 ## 8. Feature Log (Current Capabilities)
 *Updated interactively during development.*
@@ -139,6 +146,7 @@ Represents specific calls for funds or levies.
     -   **Y-Axis:** Label "RM (Payment up to date)".
     -   **X-Axis:** Label "Total Units Available (44 units)".
     -   **Tooltips:** Hovering over the X-Axis Label (Unit ID) displays the Public Note if highlighted (in addition to bar hover).
+    -   **Pending Visualization:** A stacked bar segment (or separate dataset) with a dotted border/lighter color representing "Pending" amounts.
 *   **Active Round Widget:**
     -   **Description:** Explanatory text about the nature of the active fund.
     -   **Metrics:** Show "Expected Avg/Unit" (Target / Count) and "Participating Count".

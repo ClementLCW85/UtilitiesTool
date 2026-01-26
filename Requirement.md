@@ -23,6 +23,7 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Public Submission:** Residents must be able to submit payment records via a public interface.
     - **Proof of Payment:** Capability to upload an image file (receipt). These images must be stored in the same **Google Drive** location used for Admin uploads.
     - **Seamless Experience:** Residents must NOT be required to sign in with a Google Account to upload files. The system must proxy the upload to the Admin's drive securely.
+    - **Validation Process:** Payments submitted by the public are initially marked as **"Pending Approval"**. They do not affect the total contributions until validated by an Admin.
 - Owners can contribute varying amounts each month.
 
 ### 3.3 Contribution Tracking & Dashboard
@@ -30,6 +31,7 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Visual Dashboard:** A public dashboard featuring a **bar chart** that visualizes the total contributed amount per unit.
 - **Break-Even Threshold:** The bar chart must include a **threshold line** representing the **Cumulative Break-Even Point** (Total amount of all utilities bills issued to date). This indicates the target "Zero Debt" level for the block.
 - **Highlighted Units:** The dashboard must visually distinguish specific units (e.g., different bar color or icon) that have special status (e.g., financial hardship, deceased owner). A public note should be visible for these highlighted units to explain the status.
+- **Pending Payments Visualization:** The bar chart must visually distinguish **Pending Payments** (e.g., dotted outline or separate color block) stacked on top of the confirmed amount to indicate potential incoming funds.
 - **Transparency:** The data should be presented clearly so owners can verify their total contributions against the recorded electric account.
 
 ### 3.4 Administration (Restricted Access)
@@ -38,8 +40,13 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Payment Recording:** Admins can manually add payment records for each unit/owner.
     - **Proof of Payment:** Capability to upload an image file (receipt). The system will upload this file to the Admin's **Google Drive** using the Drive API and store the resulting shareable link.
 - **Payment Record Management:**
-    - **Removal & Archiving:** Admins can remove payment records from the active database. Removed records are moved to an archive table and must not be included in the calculation of total collected funds.
-    - **Archive Cleanup:** Admins can permanently delete records from the archive database.
+- **Approval Queue:** Admins view a list of "Pending Payments". They can:
+    - **Modify:** Correct amounts or references before approval.
+    - **Approve:** Commit the record to the active ledger.
+    - **Reject:** Move the record directly to the archive (trash).
+- **Removal & Archiving:** Admins can remove payment records from the active database. Removed records are moved to an archive table and must not be included in the calculation of total collected funds. 
+- **Archive differentiation:** Admins must be able to distinguish between manually deleted records and rejected public submissions in the archive.
+- **Archive Cleanup:** Admins can permanently delete records from the archive database.
 - **Threshold & Bill Management:** Admins record the monthly bill amounts, which automatically updates the global "Break-Even Threshold."
 - **Unit Management:**
     - **Highlighting:** Admins can flag specific units as "Highlighted" and append a text note (e.g., "Critical Illness - Exempt").

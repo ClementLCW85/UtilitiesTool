@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** None (All Tasks Completed)
-**Next Priority:** Maintenance & Documentation
+**Active Task:** PAY-7 Admin Approval Queue
+**Next Priority:** PAY-8 Rejected Payment Archiving
 
 
 ## 📊 Progress Tracker
@@ -41,6 +41,10 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Implemented Google Apps Script proxy code and updated frontend to allow no-auth uploads.
 - [x] **PAY-6** Payment Removal & Archiving
     - *Status:* Completed. Admin capability to archive records (remove from totals) and permanently delete them from archive.
+- [ ] **PAY-7** Admin Approval Queue
+    - *Status:* Pending. Admin UI for Pending Payments (Approve/Reject). "Public Submission" updates to use pending.
+- [ ] **PAY-8** Rejected Payment Archiving
+    - *Status:* Pending. Schema update for archives and Admin view filter.
 
 ### 4. Epic: Public Dashboard & Visualization
 - [x] **DASH-1** Dashboard Layout & Data Fetching
@@ -57,6 +61,8 @@ Updates to this document should happen after completing each user story.
 - *Status:* Completed. Added Title, Axis Labels, and MinBarLength for interactivity.
 - [x] **DASH-7** Layout & Stats Context
 - *Status:* Completed. Top-Chart Layout, Date Context.
+- [ ] **DASH-8** Pending Payment Visualization
+    - *Status:* Pending. Dotted bar segment for pending amounts.
 
 ### 5. Epic: Unit & System Administration
 - [x] **ADM-1** Unit Status Management
