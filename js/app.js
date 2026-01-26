@@ -970,34 +970,29 @@ async function loadArchivedPayments() {
     const filterVal = document.getElementById('archive-filter') ? document.getElementById('archive-filter').value : 'all';
 
     try {
-        // Fix BloomFilter Error: Remove backend orderBy when combining with where
-        // Perform Client-Side sorting instead
-        let query = window.db.collection('archived_payments');
+        // Fix BloomFilter & Refresh Issue: Move Filtering & Sorting to Client-Side
+        // Fetch last 100 archived items (avoids needing index on 'source')
+        const snapshot = await window.db.collection('archived_payments')
+             .orderBy('archivedAt', 'desc')
+             .limit(100)
+             .get();
         
+        let docs = [];
+        snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+
+        // Client-Side Filtering
         if (filterVal === 'deleted') {
-            query = query.where('source', '==', 'deleted');
+            docs = docs.filter(d => d.source === 'deleted');
         } else if (filterVal === 'rejected') {
-            query = query.where('source', '==', 'rejected');
+            docs = docs.filter(d => d.source === 'rejected');
         }
-        
-        const snapshot = await query.get();
-        if (snapshot.empty) {
-            tbody.innerHTML = '<tr><td colspan="5">No archived records found.</td></tr>';
+
+        if (docs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">No records match the filter.</td></tr>';
             return;
         }
 
         tbody.innerHTML = '';
-        
-        // Convert to array and sort manually
-        const docs = [];
-        snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-        
-        // Sort DESC by archivedAt
-        docs.sort((a, b) => {
-            const timeA = a.archivedAt ? a.archivedAt.seconds : 0;
-            const timeB = b.archivedAt ? b.archivedAt.seconds : 0;
-            return timeB - timeA;
-        });
 
         docs.forEach(data => {
             const sourceLabel = data.source === 'rejected' ? '<span style="color:red; font-weight:bold;">Rejected</span>' : 'Deleted';
@@ -1205,84 +1200,7 @@ async function rejectPayment(btn) {
     }
 }
 
-// PAY-6 Archive Management
-function bindArchiveEvents() {
-    const toggleBtn = document.getElementById('toggle-archive-btn');
-    const section = document.getElementById('archived-payments-section');
-    
-    if (!toggleBtn || !section) return;
-
-    toggleBtn.addEventListener('click', () => {
-        if (section.style.display === 'none') {
-            section.style.display = 'block';
-            toggleBtn.textContent = 'Hide Archived Payments';
-            loadArchivedPayments(); // Load data when opening
-        } else {
-            section.style.display = 'none';
-            toggleBtn.textContent = 'View Archived Payments';
-        }
-    });
-}
-
-function loadArchivedPayments() {
-    const tbody = document.querySelector('#archived-history-table tbody');
-    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
-
-    window.db.collection('archived_payments')
-        .orderBy('archivedAt', 'desc')
-        .limit(50) // Limit display
-        .get()
-        .then(snapshot => {
-             tbody.innerHTML = '';
-             if(snapshot.empty) {
-                 tbody.innerHTML = '<tr><td colspan="5">No archived payments found.</td></tr>';
-                 return;
-             }
-
-             snapshot.forEach(doc => {
-                 const data = doc.data();
-                 const archivedDate = data.archivedAt && data.archivedAt.toDate ? 
-                                    data.archivedAt.toDate().toLocaleDateString() : 
-                                    'Unknown';
-
-                 const tr = document.createElement('tr');
-                 tr.innerHTML = `
-                    <td>${data.unitNumber}</td>
-                    <td>${data.date}</td>
-                    <td>${formatCurrency(data.amount)}</td>
-                    <td>${archivedDate}</td>
-                    <td><button class="delete-permanent-btn" data-id="${doc.id}" style="background-color:#dc3545; padding: 2px 8px; font-size: 0.8rem;">Permanently Delete</button></td>
-                 `;
-                 tbody.appendChild(tr);
-             });
-
-             // Bind permanent delete
-             document.querySelectorAll('.delete-permanent-btn').forEach(btn => {
-                btn.addEventListener('click', (ev) => {
-                    const id = ev.target.getAttribute('data-id');
-                    deleteArchivedPayment(id);
-                });
-            });
-        })
-        .catch(err => {
-            console.error("Error loading archive:", err);
-            tbody.innerHTML = '<tr><td colspan="5">Error loading archive.</td></tr>';
-        });
-}
-
-function deleteArchivedPayment(docId) {
-    if(!confirm("WARNING: This will PERMANENTLY DELETE this record from the archive. This action cannot be undone. Are you sure?")) return;
-
-    window.db.collection('archived_payments').doc(docId).delete()
-        .then(() => {
-            alert("Record permanently deleted.");
-            loadArchivedPayments(); // Refresh
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Failed to delete record.");
-        });
-}
+// Duplicated logic removed
 
 // --- Collection Rounds Management ---
 
