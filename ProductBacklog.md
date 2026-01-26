@@ -55,6 +55,7 @@
 | ADM-1 | Unit Status Management | Admin interface to toggle "Highlighted" status for a unit and edit the associated Public Note. | Medium | INF-3, INF-4 |
 | ADM-2 | Manual Threshold Override | Option for Admin to manually set the Threshold Line value (overriding the auto-sum) if needed for adjustments. | Low | DASH-3 |
 | ADM-3 | Data Export | Button to download current state (bills/payments) as JSON/CSV for backup. | Low | BILL-1, PAY-1 |
+| ADM-4 | Unclaimed Funds Management | Admin interface to set a floating "Unclaimed" amount (payments not linked to units). visualized as a special unit in Dashboard. | High | ADM-2 |
 
 ## 6. Epic: Collection Rounds Management
 **Goal:** Manage and visualize specific fundraising rounds.
