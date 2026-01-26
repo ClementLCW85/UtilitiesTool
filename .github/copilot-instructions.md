@@ -1,7 +1,7 @@
 # AI Instructions
 
 ## Purpose
-This file provides specific operational instructions for the AI assistant ("GitHub Copilot") when working on the **Seapark Apartment Block E Utility Tracker** project.
+This file provides specific operational instructions for the AI assistant ("GitHub Copilot") when working on the **Seapark Apartment Block E Utility Tracker** project. This project is an HTML/JavaScript project and does not require a `run_build` or compilation step in its plans, avoiding unnecessary validation steps for future tasks.
 
 ## Project File & Folder Structure
 
@@ -25,7 +25,7 @@ This file provides specific operational instructions for the AI assistant ("GitH
 ## Operational Rules
 
 ### 0. Code Formatting & Standards (Strict)
-**trigger:** Only run during commits and push the code. It shall be the first to run before any git command is performed.
+**trigger:** Only run during commits and push the code. It shall be the first to run before any git command is performed.  
 **action:** You **MUST** ensure the following standards are applied. After making edits, you SHOULD run `powershell -File tools/format_files.ps1` to enforce compliance.
 
 #### Markdown (`.md`)
@@ -40,7 +40,7 @@ This file provides specific operational instructions for the AI assistant ("GitH
 - **EOF:** File must end with a single CRLF newline character.
 
 ### 1. Feature Logging
-**trigger:** Every time you generate a commit message, pull request description, or build log summary.
+**trigger:** Every time you generate a commit message, pull request description, or build log summary.  
 **action:** You **MUST** consult the `DESIGN.md` file, Section 8 ("Feature Log"), and append a brief summary of the *currently available features* to your output.
 
 **Format Example:**
@@ -56,15 +56,19 @@ This file provides specific operational instructions for the AI assistant ("GitH
 ```
 
 ### 2. Design Consistency
-**trigger:** When implementing new features.
+**trigger:** When implementing new features.  
 **action:** Verify that the implementation aligns with the `Database Design` and `System Flows` defined in `DESIGN.md`. If a deviation is required (refactoring), you must update `DESIGN.md` first.
 
 ### 3. Feature Flag updates
-**trigger:** When a User Story (e.g., "PAY-1") is completed.
+**trigger:** When a User Story (e.g., "PAY-1") is completed.  
 **action:**
 1. Update `MasterPlan.md` (Progress).
 2. Update `DESIGN.md` (Section 8 - Feature Log) to mark the feature as "✅ Available".
 
----
+### 4. File Creation Robustness
+**trigger:** When `create_file` fails or when scripting commit messages.  
+**action:** Use `Set-Content` in PowerShell to create files, ensuring robustness in the environment.
+
+---  
 *End of Instructions*
 

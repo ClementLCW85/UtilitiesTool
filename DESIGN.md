@@ -124,3 +124,23 @@ Represents specific calls for funds or levies.
 | **COL-1** | **Define Rounds** | Admin interface to define specific collection rounds and participants. | ✅ Available |
 | **COL-2** | **Round Visualization** | Public Dashboard showing active round, progress, and history. | ✅ Available |
 
+## 9. UI/UX Specifications
+
+### Public Dashboard Layout
+1.  **Order:** Bar Chart (Top) -> Stats Overview -> Active Fund Round -> Other Sections.
+2.  **Stats Logic:**
+    -   **Beginning Date:** Earliest recorded bill date.
+    -   **Cumulative Totals:** All sums are calculated from this date forward.
+    -   **Description:** Dashboard must explicitly state this period.
+
+### Component Behaviors
+*   **Unit Bar Chart:**
+    -   **Title:** "Contributions per Unit".
+    -   **Y-Axis:** Label "RM (Payment up to date)".
+    -   **X-Axis:** Label "Total Units Available (44 units)".
+    -   **Tooltips:** Hovering over the X-Axis Label (Unit ID) displays the Public Note if highlighted (in addition to bar hover).
+*   **Active Round Widget:**
+    -   **Description:** Explanatory text about the nature of the active fund.
+    -   **Metrics:** Show "Expected Avg/Unit" (Target / Count) and "Participating Count".
+    -   **Unit List:** Toggleable view of all participating unit numbers.
+

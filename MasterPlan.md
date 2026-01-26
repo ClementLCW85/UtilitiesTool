@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** None (All Tasks Completed)
-**Next Priority:** Maintenance & Documentation
+**Active Task:** DASH-7 Layout & Stats Context
+**Next Priority:** DASH-6 Chart Enhancements
 
 
 ## 📊 Progress Tracker
@@ -53,6 +53,10 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Implemented logic to color bars orange if `isHighlighted` is true, and show `publicNote` in tooltip.
 - [x] **DASH-5** Mobile Responsiveness
     - *Status:* Completed. Implemented CSS Media Queries for layout adjustments and Horizontal Scroll for data tables.
+- [ ] **DASH-6** Chart Enhancements
+    - *Status:* Pending. Axis Titles, X-Axis Tooltips.
+- [ ] **DASH-7** Layout & Stats Context
+    - *Status:* Pending. Top-Chart Layout, Date Context.
 
 ### 5. Epic: Unit & System Administration
 - [x] **ADM-1** Unit Status Management
@@ -67,6 +71,8 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Admin interface implemented to Create/Edit rounds with unit selection.
 - [x] **COL-2** Dashboard Round Display
 - *Status:* Completed. Public dashboard widget created with `loadLatestRound` and history toggle.
+- [ ] **COL-3** Extended Round Details
+    - *Status:* Pending. Avg/Cost, Count, Unit List.
 
 ## 📝 Notes & Decisions
 - **Hosting:** GitHub Pages via GitHub Actions.

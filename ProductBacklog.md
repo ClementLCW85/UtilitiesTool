@@ -41,6 +41,8 @@
 | DASH-3 | Global Break-Even Threshold Line | **Logic Clarification required:** Add a horizontal line across the chart. <br> *Decision:* Line represents (Total Cumulative Bills / 44 Units) to show "Target per Unit". <br> *Alt:* If chart is aggregate, line is Total Bills. | High | DASH-2, BILL-3 |
 | DASH-4 | Highlighted Unit Status | Visual indicator (color/icon) for specific units flagged as "Special Case" (e.g., Hardship). Display public note on hover/click. | Medium | DASH-2, ADM-1 |
 | DASH-5 | Mobile Responsiveness | Ensure chart and data tables are readable on mobile devices. | Medium | DASH-1 |
+| DASH-6 | Chart Enhancements | Add "Contributions per Unit" title, Axis Titles (Y: RM, X: Units), and enable Public Note tooltip on X-axis labels. | Medium | DASH-2 |
+| DASH-7 | Layout & Context | Move Chart to Top. Add text explaining "Beginning Date" and cumulative nature of stats. | High | DASH-1 |
 
 ## 5. Epic: Unit & System Administration
 **Goal:** Manage unit status and system configuration.
@@ -58,3 +60,4 @@
 |----|-------|-------------|----------|--------------|
 | COL-1 | Define Collection Round (Admin) | Form to Create/Edit a Round: Title, Amount, Start Date, Remarks, and Participating Units (Multi-select). | High | INF-4 |
 | COL-2 | Collection Round Visualization (Public) | Dashboard component to show the Latest Round details and a clickable list/modal for History. | High | COL-1 |
+| COL-3 | Extended Round Details | Add Description text, Avg Cost/Unit, Participant Count, and Toggleable Unit List to widget. | High | COL-2 |
