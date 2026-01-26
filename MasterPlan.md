@@ -71,6 +71,8 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Implemented manual target override in Admin/System Config and updated Dashboard logic.
 - [x] **ADM-3** Data Export
 - *Status:* Completed. Implemented JSON export of Bills, Payments, Units, and System Stats.
+- [ ] **ADM-4** Unclaimed Funds Management
+    - *Status:* Pending. Admin interface to manage floating amounts and visualization in Dashboard.
 
 ### 6. Epic: Collection Rounds Management
 - [x] **COL-1** Define Collection Round

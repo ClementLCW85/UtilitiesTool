@@ -63,6 +63,7 @@ Stores global aggregates.
 - Document: `stats`
 - `totalBillsAmount` (Number): Sum of all `bills`.
 - `unitTarget` (Number): `totalBillsAmount` / 44.
+- `unclaimedAmount` (Number): Floating funds not linked to specific units.
 - `isOverrideEnabled` (Boolean): If true, use `overrideTarget`.
 - `lastUpdated` (Timestamp).
 
@@ -125,6 +126,7 @@ Represents specific calls for funds or levies.
 | **ADM-1** | **Unit Status Mgmt** | Admin interface to toggle Highlight status and edit Public Notes. | ✅ Available |
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
+| **ADM-4** | **Unclaimed Funds** | Manage floating unclaimed amounts and display as special unit in chart. | ⏳ Pending |
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
@@ -147,6 +149,7 @@ Represents specific calls for funds or levies.
     -   **X-Axis:** Label "Total Units Available (44 units)".
     -   **Tooltips:** Hovering over the X-Axis Label (Unit ID) displays the Public Note if highlighted (in addition to bar hover).
     -   **Pending Visualization:** A stacked bar segment (or separate dataset) with a dotted border/lighter color representing "Pending" amounts.
+    -   **Unclaimed Display:** A special bar entry labeled "Unclaimed" (or similar) with distinct color, included in calculation of total collected.
 *   **Active Round Widget:**
     -   **Description:** Explanatory text about the nature of the active fund.
     -   **Metrics:** Show "Expected Avg/Unit" (Target / Count) and "Participating Count".
