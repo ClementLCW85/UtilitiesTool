@@ -77,6 +77,21 @@ Represents specific calls for funds or levies.
 - `remarks` (String): Explanation for the residents.
 - `createdAt` (Timestamp).
 
+### Collection: `unclaimed_records`
+Stores individual floating fund entires.
+- `id` (Auto-ID).
+- `date` (String): Payment Date ISO.
+- `amount` (Number): Value.
+- `remarks` (String): Identification details.
+- `createdAt` (Timestamp).
+
+### Collection: `archived_unclaimed`
+Snapshots of unclaimed records after being resolved.
+- Same as `unclaimed_records`, plus:
+- `archivedAt` (Timestamp).
+- `status`: "converted" (became a real payment) or "deleted" (removed by admin).
+- `convertedPaymentId` (String, Optional): Link to the real payment if converted.
+
 ## 5. Modules & Code Structure
 - **`index.html`**: Single Page Application (SPA) container. Switches views via hash routing.
 - **`css/style.css`**: Global styling.
@@ -104,6 +119,8 @@ Represents specific calls for funds or levies.
 -   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
 -   **Public Submission:** Resident selects Unit -> Input Amount -> Selects File -> App POSTs Base64 data to GAS Web App -> GAS saves to Admin Drive -> Returns URL -> App writes to `pending_payments` collection.
 -   **Admin Approval:** Admin reviews `pending_payments` -> Modifies/Approves (Moves to `payments`, increments `Unit.total`) OR Rejects (Moves to `archived_payments` marked as "rejected").
+-   **Unclaimed Mgmt:** Admin adds record -> Saves to `unclaimed_records`.
+-   **Unclaimed Conversion:** Admin selects Unclaimed Record -> Assigns Unit -> Inputs Receipt -> Transaction: (Create `Payment` + Increment Unit + Move Unclaimed to `archived_unclaimed` as "converted").
 
 ## 8. Feature Log (Current Capabilities)
 *Updated interactively during development.*
@@ -127,6 +144,7 @@ Represents specific calls for funds or levies.
 | **ADM-2** | **Manual Override** | Manual override for Global Break-Even Threshold Target. | ✅ Available |
 | **ADM-3** | **Data Backup** | JSON Export of full database state. | ✅ Available |
 | **ADM-4** | **Unclaimed Funds** | Manage floating unclaimed amounts and display as special unit in chart. | ✅ Available |
+| **ADM-5** | **Detailed Unclaimed** | Record-level management, conversion to payment, and archiving of unclaimed funds. | ✅ Available |
 | **PAY-4** | **Public Payment** | Residents can submit payments and receipts (Google Drive) via public UI. | ✅ Available |
 | **PAY-5** | **Seamless Upload**| Google Apps Script proxy for public receipt uploads (No Login required). | ✅ Available |
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |

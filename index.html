@@ -463,21 +463,101 @@
                     <hr>
                     <section id="unclaimed-funds-section">
                         <h3>Finance Management</h3>
+                        
+                        <!-- Create New -->
                         <form id="unclaimed-form" class="admin-form">
                             <fieldset>
-                                <legend>Floating / Unclaimed Funds</legend>
-                                <p class="small-note">Manage funds recieved but not linked to specific units (e.g. unknown deposits).</p>
+                                <legend>Add Unclaimed Fund Record</legend>
+                                <p class="small-note">Log funds received with unknown source.</p>
                                 
                                 <div class="form-group">
-                                    <label for="unclaimed-amount">Total Unclaimed Amount (RM):</label>
+                                    <label for="unclaimed-date">Date Received:</label>
+                                    <input type="date" id="unclaimed-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="unclaimed-amount">Amount (RM):</label>
                                     <input type="number" id="unclaimed-amount" min="0" step="0.01" placeholder="e.g. 50.00" required>
                                 </div>
+                                <div class="form-group">
+                                    <label for="unclaimed-remarks">Remarks (Bank Ref / Desc):</label>
+                                    <input type="text" id="unclaimed-remarks" placeholder="e.g. Cash Deposit CDM" required>
+                                </div>
 
-                                <button type="submit">Update Unclaimed Amount</button>
+                                <button type="submit">Add Record</button>
                                 <span id="unclaimed-form-status" class="small-note"></span>
                             </fieldset>
                         </form>
+
+                        <!-- Active List -->
+                        <h4>Active Unclaimed Records</h4>
+                        <div class="table-wrapper">
+                            <table id="unclaimed-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Remarks</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr><td colspan="4">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Archive Toggle -->
+                        <div style="margin-top: 15px;">
+                            <button id="toggle-unclaimed-archive" class="text-btn">View Archived Unclaimed</button>
+                        </div>
+                        <div id="unclaimed-archive-container" style="display:none; margin-top:10px;">
+                            <h4>Archived Unclaimed</h4>
+                            <div class="table-wrapper">
+                                <table id="unclaimed-archive-table" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Remarks</th>
+                                            <th>Archived At</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </section>
+                    
+                    <!-- Conversion Modal -->
+                    <div id="convert-modal" class="modal">
+                        <div class="modal-content">
+                            <span id="close-convert-modal" class="close-modal">&times;</span>
+                            <h3>Convert to Payment</h3>
+                            <p>Assign this unclaimed fund to a unit.</p>
+                            
+                            <form id="convert-form">
+                                <input type="hidden" id="convert-id">
+                                <input type="hidden" id="convert-amount-hidden">
+                                
+                                <p><strong>Amount:</strong> RM <span id="convert-display-amount"></span></p>
+                                <p><strong>Date:</strong> <span id="convert-display-date"></span></p>
+                                <p><strong>Remarks:</strong> <span id="convert-display-remarks"></span></p>
+                                
+                                <div class="form-group">
+                                    <label for="convert-unit">Assign Unit:</label>
+                                    <select id="convert-unit" required class="full-width">
+                                        <!-- Populated via JS -->
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="convert-receipt">Upload Receipt (Optional):</label>
+                                    <input type="file" id="convert-receipt">
+                                </div>
+
+                                <button type="submit" style="background-color: var(--success-color);">Confirm Conversion</button>
+                            </form>
+                        </div>
+                    </div>
 
                     <hr>
                     <section id="system-config-section">
