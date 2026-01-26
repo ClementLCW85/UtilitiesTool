@@ -22,8 +22,26 @@
         <!-- Public Dashboard Section -->
         <section id="dashboard" class="view-section">
             <h2>Public Dashboard</h2>
+
+            <!-- 1. Chart Section (Top) -->
+            <div id="chart-controls" style="text-align: center; margin-bottom: 10px;">
+                <label>Filter by Floor: </label>
+                <button class="floor-btn active" data-floor="all">All</button>
+                <button class="floor-btn" data-floor="1">Level 1</button>
+                <button class="floor-btn" data-floor="2">Level 2</button>
+                <button class="floor-btn" data-floor="3">Level 3</button>
+                <button class="floor-btn" data-floor="4">Level 4</button>
+            </div>
+
+            <div id="chart-container">
+                <p id="chart-loading-msg">Loading chart...</p>
+                <div class="chart-scroll-wrapper">
+                    <canvas id="unit-bar-chart"></canvas>
+                </div>
+            </div>
             
-            <div id="stats-overview" class="stats-grid">
+            <!-- 2. Stats Section -->
+            <div id="stats-overview" class="stats-grid" style="margin-top: 20px;">
                 <div class="stat-card">
                     <h3>Global Break-Even</h3>
                     <p id="stat-total-bills" class="stat-value">Loading...</p>
@@ -45,8 +63,13 @@
                     <span class="stat-label">Deficit / Surplus</span>
                 </div>
             </div>
+            
+            <!-- Context Note -->
+            <div style="text-align: center; margin: 10px 0 20px 0; color: #555;">
+                <p id="stats-context-msg" class="small-note">Loading context...</p>
+            </div>
 
-            <!-- Collection Round Widget -->
+            <!-- 3. Active Round Widget -->
             <div id="collection-round-widget" class="info-card" style="display:none; margin-bottom: 20px;">
                 <div class="card-header-flex">
                     <h3>Active Fund Round</h3>
@@ -81,22 +104,6 @@
                 <div id="round-history-container" style="display:none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
                      <h4 style="margin-top:0; font-size: 1rem;">Past Rounds</h4>
                      <ul id="round-history-list" style="list-style: none; padding: 0; font-size: 0.9rem;"></ul>
-                </div>
-            </div>
-
-            <div id="chart-controls" style="text-align: center; margin-bottom: 10px;">
-                <label>Filter by Floor: </label>
-                <button class="floor-btn active" data-floor="all">All</button>
-                <button class="floor-btn" data-floor="1">Level 1</button>
-                <button class="floor-btn" data-floor="2">Level 2</button>
-                <button class="floor-btn" data-floor="3">Level 3</button>
-                <button class="floor-btn" data-floor="4">Level 4</button>
-            </div>
-
-            <div id="chart-container">
-                <p id="chart-loading-msg">Loading chart...</p>
-                <div class="chart-scroll-wrapper">
-                    <canvas id="unit-bar-chart"></canvas>
                 </div>
             </div>
         </section>

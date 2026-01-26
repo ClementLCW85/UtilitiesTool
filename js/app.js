@@ -181,6 +181,27 @@ async function loadDashboardData() {
         statusEl.innerText = (diff >= 0 ? "+" : "") + formatCurrency(diff);
         statusEl.style.color = diff >= 0 ? "var(--success-color)" : "var(--error-color)";
 
+        // Context Logic (DASH-7)
+        // Find earliest bill date
+        const billsSnap = await window.db.collection('bills').orderBy('issueDate', 'asc').limit(1).get();
+        let dateText = "the beginning";
+        if (!billsSnap.empty) {
+            const billData = billsSnap.docs[0].data();
+            // Assuming issueDate is YYYY-MM-DD
+            if(billData.issueDate) {
+                 const d = new Date(billData.issueDate);
+                 dateText = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+        }
+        
+        const contextEl = document.getElementById('stats-context-msg');
+        if(contextEl) {
+            contextEl.innerHTML = `
+                The <strong>Total Collected</strong> is calculated since <strong>${dateText}</strong> (based on the earliest recorded bill).<br>
+                The <strong>Status</strong> reflects the current financial standing from that starting date until now.
+            `;
+        }
+
         // Render Chart
         renderChart(dashboardUnits, dashboardTarget);
 
