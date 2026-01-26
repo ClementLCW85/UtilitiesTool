@@ -87,6 +87,14 @@
                             <span class="label">Collected:</span>
                             <span id="round-collected" class="value">-</span>
                         </div>
+                        <div class="metric-item">
+                             <span class="label">Avg/Unit:</span>
+                             <span id="round-avg" class="value">-</span>
+                        </div>
+                        <div class="metric-item">
+                             <span class="label">Units:</span>
+                             <span id="round-count" class="value">-</span>
+                        </div>
                     </div>
 
                     <div class="progress-container">
@@ -98,6 +106,11 @@
 
                     <p id="widget-round-remarks" class="round-remarks"></p>
                     <p class="small-note">Includes payments since <span id="widget-round-start-date">-</span> from participating units.</p>
+                    
+                    <div style="margin-top: 10px;">
+                        <button id="widget-participant-toggle" class="text-btn" style="font-size: 0.85rem;">Show Participating Units</button>
+                        <div id="widget-participant-list" style="display:none; margin-top: 5px; font-size: 0.8rem; background: #f9f9f9; padding: 10px; border-radius: 4px;"></div>
+                    </div>
                 </div>
 
                 <!-- History Container (Hidden by default) -->

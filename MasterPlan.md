@@ -4,8 +4,8 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** COL-3 Extended Round Details
-**Next Priority:** None
+**Active Task:** None (All Tasks Completed)
+**Next Priority:** Maintenance & Documentation
 
 
 ## 📊 Progress Tracker
@@ -71,8 +71,8 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Admin interface implemented to Create/Edit rounds with unit selection.
 - [x] **COL-2** Dashboard Round Display
 - *Status:* Completed. Public dashboard widget created with `loadLatestRound` and history toggle.
-- [ ] **COL-3** Extended Round Details
-    - *Status:* Pending. Avg/Cost, Count, Unit List.
+- [x] **COL-3** Extended Round Details
+- *Status:* Completed. Added Avg/Cost, Count, and Toggleable Unit List.
 
 ## 📝 Notes & Decisions
 - **Hosting:** GitHub Pages via GitHub Actions.

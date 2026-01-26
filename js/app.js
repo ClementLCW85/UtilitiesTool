@@ -1236,6 +1236,47 @@ async function loadLatestRound() {
 
         const collectedEl = document.getElementById('round-collected');
         if (collectedEl) collectedEl.innerText = formatCurrency(collected);
+
+        // Extended Details (COL-3)
+        const count = round.participatingUnitIds ? round.participatingUnitIds.length : 0;
+        const avg = count > 0 ? (round.targetAmount / count) : 0;
+
+        const countEl = document.getElementById('round-count');
+        if (countEl) countEl.innerText = count;
+
+        const avgEl = document.getElementById('round-avg');
+        if (avgEl) avgEl.innerText = formatCurrency(avg);
+
+        // Participant Toggle Logic
+        const toggleBtn = document.getElementById('widget-participant-toggle');
+        const listDiv = document.getElementById('widget-participant-list');
+        
+        if (toggleBtn && listDiv) {
+             // Reset state
+             listDiv.style.display = 'none';
+             listDiv.innerText = '';
+             toggleBtn.innerText = 'Show Participating Units';
+             toggleBtn.style.display = 'block'; // Ensure visible
+
+             // Clone and replace to remove old listeners (cleanest way without named function)
+             const newBtn = toggleBtn.cloneNode(true);
+             toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+             
+             newBtn.addEventListener('click', () => {
+                 if (listDiv.style.display === 'none') {
+                     listDiv.style.display = 'block';
+                     newBtn.innerText = 'Hide Participating Units';
+                     if (round.participatingUnitIds) {
+                         // Sort naturally
+                         const sorted = [...round.participatingUnitIds].sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+                         listDiv.innerText = sorted.join(', ');
+                     }
+                 } else {
+                     listDiv.style.display = 'none';
+                     newBtn.innerText = 'Show Participating Units';
+                 }
+             });
+        }
         
         // Progress Logic
         let pct = 0;
