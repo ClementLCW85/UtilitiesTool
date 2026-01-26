@@ -1501,7 +1501,7 @@ async function loadLatestRound() {
     try {
         const snapshot = await window.db.collection('collection_rounds')
             .orderBy('startDate', 'desc')
-            .limit(1)
+            .limit(2)
             .get();
 
         if (snapshot.empty) {
@@ -1521,16 +1521,22 @@ async function loadLatestRound() {
         const targetEl = document.getElementById('round-target');
         if (targetEl) targetEl.innerText = formatCurrency(round.targetAmount);
 
+        // Determine Effective Start Date (start of previous round if exists)
+        let effectiveStartDate = round.startDate;
+        if (snapshot.docs.length > 1) {
+             effectiveStartDate = snapshot.docs[1].data().startDate || round.startDate;
+        }
+
         const dateEl = document.getElementById('widget-round-start-date');
-        if (dateEl) dateEl.innerText = round.startDate;
+        if (dateEl) dateEl.innerText = effectiveStartDate;
 
         const remarksEl = document.getElementById('widget-round-remarks');
         if (remarksEl) remarksEl.innerText = round.remarks || '';
 
         // Calculate Collected Amount
-        // Query payments where date >= round.startDate
+        // Query payments from effectiveStartDate (Previous Round Start)
         const paySnapshot = await window.db.collection('payments')
-            .where('date', '>=', round.startDate)
+            .where('date', '>=', effectiveStartDate)
             .get();
 
         let collected = 0;
