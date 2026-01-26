@@ -152,6 +152,7 @@ Snapshots of unclaimed records after being resolved.
 | **COL-2** | **Round Visualization** | Public Dashboard showing active round, progress, and history. | ✅ Available |
 | **COL-3** | **Extended Round Details** | Added Avg/Cost, Count, and Toggleable Unit List to Round widget. | ✅ Available |
 | **DASH-9** | **View Bill Details** | Toggleable list of monthly bills used for global calculation on the dashboard. | ✅ Available |
+| **ADM-6** | **Admin UI Segmentation** | Tabbed interface for Admin Dashboard to separate features and reduce scrolling. | ✅ Available |
 
 ## 9. UI/UX Specifications
 

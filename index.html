@@ -206,6 +206,19 @@
                 
                 <div class="admin-panel">
                     <h3>Management Options</h3>
+                    
+                    <!-- Admin Tabs Navigation -->
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" data-tab="tab-bills">Monthly Bills</button>
+                        <button class="admin-tab" data-tab="tab-payments">Payments</button>
+                        <button class="admin-tab" data-tab="tab-units">Units</button>
+                        <button class="admin-tab" data-tab="tab-rounds">Collection Rounds</button>
+                        <button class="admin-tab" data-tab="tab-unclaimed">Unclaimed Funds</button>
+                        <button class="admin-tab" data-tab="tab-system">System</button>
+                    </div>
+
+                    <!-- TAB 1: Monthly Bills -->
+                    <div id="tab-bills" class="admin-tab-content active">
                     <form id="bill-form" class="admin-form">
                         <fieldset>
                             <legend>Record New Electric Bill</legend>
@@ -264,7 +277,10 @@
                         </div>
                         <span id="bill-history-status" class="small-note"></span>
                     </section>
-                    <hr>
+                    </div>
+
+                    <!-- TAB 2: Payments -->
+                    <div id="tab-payments" class="admin-tab-content" style="display:none;">
                     <section id="payment-approval-section">
                         <h3>Pending Payment Approvals</h3>
                          <div class="table-wrapper">
@@ -383,8 +399,10 @@
                             </table>
                         </div>
                     </section>
-
-                    <hr>
+                    </div>
+                    
+                    <!-- TAB 3: Units -->
+                    <div id="tab-units" class="admin-tab-content" style="display:none;">
                     <section id="unit-management-section">
                         <h3>Unit Status Management</h3>
                         <form id="unit-status-form" class="admin-form">
@@ -410,8 +428,10 @@
                             </fieldset>
                         </form>
                     </section>
+                    </div>
 
-                    <hr>
+                    <!-- TAB 4: Rounds -->
+                    <div id="tab-rounds" class="admin-tab-content" style="display:none;">
                     <section id="collection-rounds-section">
                         <h3>Collection Rounds Management</h3>
                         <form id="collection-round-form" class="admin-form">
@@ -477,8 +497,10 @@
                             </table>
                         </div>
                     </section>
+                    </div>
                     
-                    <hr>
+                    <!-- TAB 5: Unclaimed -->
+                    <div id="tab-unclaimed" class="admin-tab-content" style="display:none;">
                     <section id="unclaimed-funds-section">
                         <h3>Finance Management</h3>
                         
@@ -576,8 +598,10 @@
                             </form>
                         </div>
                     </div>
+                    </div>
 
-                    <hr>
+                    <!-- TAB 6: System -->
+                    <div id="tab-system" class="admin-tab-content" style="display:none;">
                     <section id="system-config-section">
                         <h3>System Configuration</h3>
                         <form id="threshold-form" class="admin-form">
@@ -613,6 +637,7 @@
                             </fieldset>
                         </div>
                     </section>
+                    </div>
                 </div>
             </div>
         </section>

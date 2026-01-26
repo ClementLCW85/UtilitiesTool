@@ -75,6 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Public Round History
     bindRoundHistoryEvents();
 
+    // Bind Admin UI Tabs
+    bindAdminTabs();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -2170,4 +2173,35 @@ async function rejectPayment(docId) {
         console.error("Reject Error:", e);
         alert("Error rejecting payment: " + e.message);
     }
+}
+
+// ADM-6 Admin UI Segmentation
+function bindAdminTabs() {
+    const tabs = document.querySelectorAll('.admin-tab');
+    const contents = document.querySelectorAll('.admin-tab-content');
+
+    if (tabs.length === 0) return;
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            // Hide all content sections
+            contents.forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('active');
+            });
+
+            // Activate clicked tab
+            tab.classList.add('active');
+            
+            // Show target content
+            const targetId = tab.getAttribute('data-tab');
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+                targetContent.classList.add('active');
+            }
+        });
+    });
 }
