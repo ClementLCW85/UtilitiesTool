@@ -68,6 +68,15 @@
             <div style="text-align: center; margin: 10px 0 20px 0; color: #555;">
                 <p id="stats-context-msg" class="small-note">Loading context...</p>
                 
+                <!-- Bill Detail View -->
+                <div id="dashboard-bills-wrapper" style="display:none; margin-top: 10px;">
+                    <button id="toggle-dashboard-bills" class="text-btn" style="font-size: 0.85rem;">Show Bill Details</button>
+                    <div id="dashboard-bills-details" style="display:none; text-align: left; margin: 10px auto; max-width: 500px; background: #fafafa; padding: 15px; border-radius: 6px; font-size: 0.9em; border: 1px solid #eee;">
+                        <strong>Included Monthly Bills:</strong>
+                        <ul id="dashboard-bills-list" style="padding-left: 20px; list-style-type: circle; margin-top: 5px;"></ul>
+                    </div>
+                </div>
+
                 <!-- Unclaimed Detail View -->
                 <div id="dashboard-unclaimed-wrapper" style="display:none; margin-top: 10px;">
                     <button id="toggle-dashboard-unclaimed" class="text-btn" style="font-size: 0.85rem;">Show Unclaimed Details</button>

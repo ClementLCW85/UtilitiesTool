@@ -233,17 +233,61 @@ async function loadDashboardData() {
         statusEl.innerText = (diff >= 0 ? "+" : "") + formatCurrency(diff);
         statusEl.style.color = diff >= 0 ? "var(--success-color)" : "var(--error-color)";
 
-        // Context Logic (DASH-7)
-        // Find earliest bill date
-        const billsSnap = await window.db.collection('bills').orderBy('issueDate', 'asc').limit(1).get();
+        // Context Logic (DASH-7) & Bill Details (Bill Detail View)
+        // Fetch all bills to determine start date and show details
+        const billsSnap = await window.db.collection('bills').orderBy('issueDate', 'asc').get();
+        const allBills = [];
+
         let dateText = "the beginning";
         if (!billsSnap.empty) {
-            const billData = billsSnap.docs[0].data();
-            // Assuming issueDate is YYYY-MM-DD
-            if(billData.issueDate) {
-                 const d = new Date(billData.issueDate);
+            // Earliest bill is the first one because of asc sort
+            const firstBill = billsSnap.docs[0].data();
+            if(firstBill.issueDate) {
+                 const d = new Date(firstBill.issueDate);
                  dateText = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
             }
+            
+            billsSnap.forEach(doc => allBills.push(doc.data()));
+        }
+        
+        // Populate Bill Details List (Show latest first)
+        const billsWrapper = document.getElementById('dashboard-bills-wrapper');
+        const billsList = document.getElementById('dashboard-bills-list');
+        const billsToggle = document.getElementById('toggle-dashboard-bills');
+        const billsDetails = document.getElementById('dashboard-bills-details');
+
+        if (billsWrapper && billsList) {
+             if (allBills.length > 0) {
+                 billsWrapper.style.display = 'block';
+                 billsList.innerHTML = '';
+                 
+                 // Sort descending for display
+                 const sortedBills = [...allBills].sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate));
+                 const monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+                 sortedBills.forEach(bill => {
+                     const li = document.createElement('li');
+                     const mName = (bill.month && monthNames[bill.month]) ? monthNames[bill.month] : 'Unknown';
+                     li.innerHTML = `<strong>${mName} ${bill.year || ''}:</strong> ${formatCurrency(bill.amount)} <span style="color:#666; font-size:0.85em;">(Issued: ${bill.issueDate})</span>`;
+                     billsList.appendChild(li);
+                 });
+
+                 // Bind Toggle
+                 const newToggle = billsToggle.cloneNode(true);
+                 billsToggle.parentNode.replaceChild(newToggle, billsToggle);
+
+                 newToggle.onclick = () => {
+                     if (billsDetails.style.display === 'none') {
+                         billsDetails.style.display = 'block';
+                         newToggle.innerText = 'Hide Bill Details';
+                     } else {
+                         billsDetails.style.display = 'none';
+                         newToggle.innerText = 'Show Bill Details';
+                     }
+                 };
+             } else {
+                 billsWrapper.style.display = 'none';
+             }
         }
         
         const contextEl = document.getElementById('stats-context-msg');

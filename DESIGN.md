@@ -150,6 +150,8 @@ Snapshots of unclaimed records after being resolved.
 | **PAY-6** | **Payment Archive** | Admin can archive/soft-delete payments and permanently delete them from archive. | ✅ Available |
 | **COL-1** | **Define Rounds** | Admin interface to define specific collection rounds and participants. | ✅ Available |
 | **COL-2** | **Round Visualization** | Public Dashboard showing active round, progress, and history. | ✅ Available |
+| **COL-3** | **Extended Round Details** | Added Avg/Cost, Count, and Toggleable Unit List to Round widget. | ✅ Available |
+| **DASH-9** | **View Bill Details** | Toggleable list of monthly bills used for global calculation on the dashboard. | ✅ Available |
 
 ## 9. UI/UX Specifications
 

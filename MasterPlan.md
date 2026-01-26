@@ -63,6 +63,8 @@ Updates to this document should happen after completing each user story.
 - *Status:* Completed. Top-Chart Layout, Date Context.
 - [x] **DASH-8** Pending Payment Visualization
 - *Status:* Completed. Added stacked dotted bar segment for pending amounts in chart.
+- [x] **DASH-9** View Bill Details
+- *Status:* Completed. Added toggleable list of all included electricity bills in the dashboard stats section.
 
 ### 5. Epic: Unit & System Administration
 - [x] **ADM-1** Unit Status Management

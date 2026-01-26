@@ -46,6 +46,7 @@
 | DASH-6 | Chart Enhancements | Add "Contributions per Unit" title, Axis Titles (Y: RM, X: Units), and enable Public Note tooltip on X-axis labels. | Medium | DASH-2 |
 | DASH-7 | Layout & Context | Move Chart to Top. Add text explaining "Beginning Date" and cumulative nature of stats. | High | DASH-1 |
 | DASH-8 | Pending Payment Visualization | Update Bar Chart to show Pending Payments as a stacked, dotted/lighter bar segment on top of confirmed contributions. | High | DASH-2, PAY-7 |
+| DASH-9 | View Bill Details | Ability for public users to view the list of electric bills used for the global break-even calculation. | Medium | DASH-1 |
 
 ## 5. Epic: Unit & System Administration
 **Goal:** Manage unit status and system configuration.
