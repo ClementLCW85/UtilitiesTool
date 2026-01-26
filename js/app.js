@@ -168,8 +168,13 @@ async function loadDashboardData() {
         
         // Calculate Unclaimed from Collection
         let unclaimed = 0;
-        const unclaimedSnap = await window.db.collection('unclaimed_records').get();
-        unclaimedSnap.forEach(doc => unclaimed += (doc.data().amount || 0));
+        const unclaimedRecords = [];
+        const unclaimedSnap = await window.db.collection('unclaimed_records').orderBy('date', 'desc').get();
+        unclaimedSnap.forEach(doc => {
+            const d = doc.data();
+            unclaimed += (d.amount || 0);
+            unclaimedRecords.push(d);
+        });
         
         // 2. Fetch All Units (Total Collected)
         const unitsSnapshot = await window.db.collection('units').get();
@@ -248,6 +253,43 @@ async function loadDashboardData() {
                 The <strong>Status</strong> reflects the current financial standing from that starting date until now.
             `;
         }
+
+        // --- Unclaimed Detail View Logic ---
+        const uncWrapper = document.getElementById('dashboard-unclaimed-wrapper');
+        const uncList = document.getElementById('dashboard-unclaimed-list');
+        const uncToggle = document.getElementById('toggle-dashboard-unclaimed');
+        const uncDetails = document.getElementById('dashboard-unclaimed-details');
+
+        if (uncWrapper && uncList) {
+            if (unclaimed > 0) {
+                uncWrapper.style.display = 'block';
+                uncList.innerHTML = '';
+                
+                unclaimedRecords.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${rec.date}:</strong> ${formatCurrency(rec.amount)} <span style="color:#666;">(${rec.remarks})</span>`;
+                    uncList.appendChild(li);
+                });
+
+                // Re-bind toggle (clone to clear old listeners) or just robustly check
+                // Simple clone logic
+                const newToggle = uncToggle.cloneNode(true);
+                uncToggle.parentNode.replaceChild(newToggle, uncToggle);
+                
+                newToggle.onclick = () => {
+                   if (uncDetails.style.display === 'none') {
+                       uncDetails.style.display = 'block';
+                       newToggle.innerText = 'Hide Unclaimed Details';
+                   } else {
+                       uncDetails.style.display = 'none';
+                       newToggle.innerText = 'Show Unclaimed Details';
+                   }
+                };
+            } else {
+                uncWrapper.style.display = 'none';
+            }
+        }
+        // -----------------------------------
 
         // Fetch Pending Payments for Visualization (DASH-8)
         let pendingData = new Array(dashboardUnits.length).fill(0);
