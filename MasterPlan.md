@@ -4,7 +4,7 @@ This document tracks the execution progress of the Seapark Apartment Block E Uti
 Updates to this document should happen after completing each user story.
 
 ## 📌 Current Focus
-**Active Task:** None (All Tasks Completed)
+**Active Task:** ADM-7 (Theme Customization)
 **Next Priority:** Maintenance & Documentation
 
 
@@ -76,9 +76,10 @@ Updates to this document should happen after completing each user story.
 - [x] **ADM-4** Unclaimed Funds Management
 - *Status:* Completed. Admin interface to manage floating amounts and visualization in Dashboard.
 - [x] **ADM-5** Detailed Unclaimed Funds
-- *Status:* Completed. Transition `unclaimedAmount` to collection-based tracking with Conversion/Archive features.
+    - *Status:* Completed. Transition `unclaimedAmount` to collection-based tracking with Conversion/Archive features.
 - [x] **ADM-6** Admin UI Segmentation
     - *Status:* Completed. Implemented tabbed navigation for Admin sections.
+    - [ ] **ADM-7** Theme Customization
 
 ### 6. Epic: Collection Rounds Management
 - [x] **COL-1** Define Collection Round
