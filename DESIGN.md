@@ -66,6 +66,10 @@ Stores global aggregates.
 - `unclaimedAmount` (Number): Floating funds not linked to specific units.
 - `isOverrideEnabled` (Boolean): If true, use `overrideTarget`.
 - `lastUpdated` (Timestamp).
+- Document: `settings` (New for ADM-7)
+    - `themePrimary` (String): Hex color for Header/Buttons.
+    - `themeSecondary` (String): Hex color for Accents.
+    - `themeBackground` (String): Hex color for Background.
 
 ### Collection: `collection_rounds`
 Represents specific calls for funds or levies.
@@ -153,6 +157,7 @@ Snapshots of unclaimed records after being resolved.
 | **COL-3** | **Extended Round Details** | Added Avg/Cost, Count, and Toggleable Unit List to Round widget. | ✅ Available |
 | **DASH-9** | **View Bill Details** | Toggleable list of monthly bills used for global calculation on the dashboard. | ✅ Available |
 | **ADM-6** | **Admin UI Segmentation** | Tabbed interface for Admin Dashboard to separate features and reduce scrolling. | ✅ Available |
+| **ADM-7** | **Theme Customization** | Admin interface to configure Primary/Secondary colors stored in `system/settings`. | ✅ Available |
 
 ## 9. UI/UX Specifications
 
