@@ -35,6 +35,7 @@ Represents monthly utility bills received from the provider.
 - `year` (Number): 2024.
 - `amount` (Number): Total bill amount.
 - `issueDate` (String): ISO Date YYYY-MM-DD.
+- `billUrl` (String): Link to softcopy of the bill (optional).
 - `createdAt` (Timestamp).
 
 ### Collection: `payments`
@@ -119,7 +120,7 @@ Snapshots of unclaimed records after being resolved.
 
 ## 7. System Flows
 -   **Startup:** App loads `db.js` -> Checks Auth -> Fetches Data -> Renders Dashboard.
--   **Bill Recording:** Admin validates form -> Saves `Bill` -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
+-   **Bill Recording:** Admin inputs details -> Uploads File (optional) -> Saves `Bill` with URL -> Triggers `calculateGlobalBreakEven` -> Updates `system/stats`.
 -   **Payment Recording:** Admin selects Unit -> Input Amount -> Uploads Image -> App sends to Google Drive -> Returns URL -> Batch Write (Create `Payment` doc with URL + Increment `Unit.totalContributed`).
 -   **Public Submission:** Resident selects Unit -> Input Amount -> Selects File -> App POSTs Base64 data to GAS Web App -> GAS saves to Admin Drive -> Returns URL -> App writes to `pending_payments` collection.
 -   **Admin Approval:** Admin reviews `pending_payments` -> Modifies/Approves (Moves to `payments`, increments `Unit.total`) OR Rejects (Moves to `archived_payments` marked as "rejected").
@@ -136,6 +137,7 @@ Snapshots of unclaimed records after being resolved.
 | **BILL-1** | **Record Bill** | Form to input monthly electricity bill details. | ✅ Available |
 | **BILL-2** | **Bill History** | View, Edit, and Delete historical bill records. | ✅ Available |
 | **BILL-3** | **Auto-Calc Stats** | Automatic calculation of Global Break-even & Per-Unit Target. | ✅ Available |
+| **BILL-4** | **Bill Softcopy** | Upload and store softcopy file for each bill record. | ✅ Available |
 | **PAY-1** | **Record Payment** | Admin form to record owner payments affecting unit totals. | ✅ Available |
 | **PAY-2** | **Receipt Input** | Optional link field for payment proof in Admin Form. | ✅ Available |
 | **PAY-3** | **Payment History** | Admin view to filter and list payment records per Unit. | ✅ Available |
