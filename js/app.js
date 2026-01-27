@@ -78,6 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind Admin UI Tabs
     bindAdminTabs();
 
+    // Bind Theme Management
+    bindThemeManagement();
+    
+    // Load System Settings
+    loadSystemSettings();
+
     // Listen for Auth to fetch data
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
@@ -2204,4 +2210,88 @@ function bindAdminTabs() {
             }
         });
     });
+}
+
+// ADM-7 Theme Customization
+async function loadSystemSettings() {
+    try {
+        const doc = await window.db.collection('system').doc('settings').get();
+        if (doc.exists) {
+            applyTheme(doc.data());
+        }
+    } catch (e) {
+        console.error("Error loading settings:", e);
+    }
+}
+
+function applyTheme(settings) {
+    if (!settings) return;
+    const root = document.documentElement;
+    if (settings.themePrimary) root.style.setProperty('--primary-color', settings.themePrimary);
+    if (settings.themeSecondary) root.style.setProperty('--secondary-color', settings.themeSecondary);
+    if (settings.themeBackground) root.style.setProperty('--background-color', settings.themeBackground);
+    
+    // Update input values if form exists
+    const pInput = document.getElementById('theme-primary');
+    const sInput = document.getElementById('theme-secondary');
+    const bInput = document.getElementById('theme-background');
+    if (pInput && settings.themePrimary) pInput.value = settings.themePrimary;
+    if (sInput && settings.themeSecondary) sInput.value = settings.themeSecondary;
+    if (bInput && settings.themeBackground) bInput.value = settings.themeBackground;
+}
+
+function bindThemeManagement() {
+    const form = document.getElementById('theme-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('theme-form-status');
+        status.textContent = "Saving...";
+        
+        const settings = {
+            themePrimary: document.getElementById('theme-primary').value,
+            themeSecondary: document.getElementById('theme-secondary').value,
+            themeBackground: document.getElementById('theme-background').value
+        };
+
+        try {
+            await window.db.collection('system').doc('settings').set(settings, { merge: true });
+            applyTheme(settings);
+            status.textContent = "Theme Saved!";
+            status.style.color = "var(--success-color)";
+            setTimeout(() => status.textContent = "", 3000);
+        } catch (error) {
+            console.error(error);
+            status.textContent = "Error saving theme.";
+            status.style.color = "red";
+        }
+    });
+
+    const resetBtn = document.getElementById('reset-theme-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', async () => {
+            if(confirm("Reset to default colors?")) {
+                const defaults = {
+                    themePrimary: '#0078d7',
+                    themeSecondary: '#005a9e',
+                    themeBackground: '#f4f4f9'
+                };
+                
+                // Update Inputs
+                document.getElementById('theme-primary').value = defaults.themePrimary;
+                document.getElementById('theme-secondary').value = defaults.themeSecondary;
+                document.getElementById('theme-background').value = defaults.themeBackground;
+                
+                // Submit logic
+                try {
+                    await window.db.collection('system').doc('settings').set(defaults, { merge: true });
+                    applyTheme(defaults);
+                    alert("Theme reset.");
+                } catch(e) {
+                    alert("Error resetting theme.");
+                }
+            }
+        });
+    }
 }

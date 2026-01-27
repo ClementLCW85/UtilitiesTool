@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seapark Block E Utility Tracker</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_v2.css">
 </head>
 <body>
     <header>
@@ -621,6 +621,37 @@
 
                                 <button type="submit">Save Threshold Settings</button>
                                 <span id="threshold-form-status" class="small-note"></span>
+                            </fieldset>
+                        </form>
+                    </section>
+
+                    <hr>
+
+                    <section id="theme-config-section">
+                        <h3>App Theme</h3>
+                        <form id="theme-form" class="admin-form">
+                            <fieldset>
+                                <legend>Customize Colors</legend>
+                                <p class="small-note">Changes apply to both Admin and Public Dashboards.</p>
+                                
+                                <div class="form-group">
+                                    <label for="theme-primary">Primary Color (Header, Buttons):</label>
+                                    <input type="color" id="theme-primary" value="#0078d7" style="height: 40px; padding: 2px;">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="theme-secondary">Secondary Color (Accents, Hover):</label>
+                                    <input type="color" id="theme-secondary" value="#005a9e" style="height: 40px; padding: 2px;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="theme-background">Background Color:</label>
+                                    <input type="color" id="theme-background" value="#f4f4f9" style="height: 40px; padding: 2px;">
+                                </div>
+
+                                <button type="submit">Save Theme</button>
+                                <button type="button" id="reset-theme-btn" style="background-color: #6c757d; margin-left: 10px;">Reset Default</button>
+                                <span id="theme-form-status" class="small-note"></span>
                             </fieldset>
                         </form>
                     </section>
