@@ -18,6 +18,7 @@
 | BILL-1 | Record New Bill | Form for Admin to input: Month, Year, Total Amount, Issue Date. | High | INF-3, INF-4 |
 | BILL-2 | Bill History View | List view of all recorded bills with ability to edit/delete distinct records. | Medium | BILL-1 |
 | BILL-3 | Auto-Calculate Global Break-Even | System updates the "Global Break-Even Threshold" (Cumulative Total of All Bills) whenever a bill is added/modified. | High | BILL-1 |
+| BILL-4 | Bill Softcopy Upload | Allow Admin to upload/attach PDF/Image of the bill to the record. Update Edit form to support this. | Medium | BILL-1, PAY-2 |
 
 ## 3. Epic: Owner Payment Management (Admin)
 **Goal:** Enable recording of unit contributions.

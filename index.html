@@ -252,7 +252,13 @@
                                 <label for="bill-date">Bill Issue Date:</label>
                                 <input type="date" id="bill-date" required>
                             </div>
-                            <button type="submit">Save Bill</button>
+                            <div class="form-group">
+                                <label for="bill-softcopy">Softcopy (PDF/Image):</label>
+                                <input type="file" id="bill-softcopy" accept="image/*,application/pdf">
+                                <p id="current-bill-file" class="small-note" style="display:none;"></p>
+                            </div>
+                            <button type="submit" id="bill-submit-btn">Save Bill</button>
+                            <button type="button" id="bill-cancel-btn" style="display:none; background-color: #6c757d;">Cancel Edit</button>
                             <span id="bill-form-status" class="small-note"></span>
                         </fieldset>
                     </form>
@@ -267,6 +273,7 @@
                                         <th>Year</th>
                                         <th>Amount (RM)</th>
                                         <th>Issue Date</th>
+                                        <th>Softcopy</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>

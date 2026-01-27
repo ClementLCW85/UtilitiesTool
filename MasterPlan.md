@@ -27,6 +27,8 @@ Updates to this document should happen after completing each user story.
     - *Status:* Completed. Implemented Bill History Table with Edit/Delete functionality in Admin Dashboard.
 - [x] **BILL-3** Auto-Calculate Global Break-Even
     - *Status:* Completed. Implemented automatic recalculation of total bills amount and per-unit target to `system/stats` on every bill change.
+- [x] **BILL-4** Bill Softcopy Upload
+- *Status:* Completed. Added optional file upload to Bill Form and updated History Table to view attached softcopy. Enabled Edit mode for bills.
 
 ### 3. Epic: Owner Payment Management
 - [x] **PAY-1** Record Unit Payment

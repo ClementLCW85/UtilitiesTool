@@ -277,7 +277,10 @@ async function loadDashboardData() {
                  sortedBills.forEach(bill => {
                      const li = document.createElement('li');
                      const mName = (bill.month && monthNames[bill.month]) ? monthNames[bill.month] : 'Unknown';
-                     li.innerHTML = `<strong>${mName} ${bill.year || ''}:</strong> ${formatCurrency(bill.amount)} <span style="color:#666; font-size:0.85em;">(Issued: ${bill.issueDate})</span>`;
+                     const softcopyLink = bill.billUrl 
+                        ? ` <a href="${bill.billUrl}" target="_blank" style="font-size: 0.8em; margin-left: 5px;">[View Bill]</a>` 
+                        : '';
+                     li.innerHTML = `<strong>${mName} ${bill.year || ''}:</strong> ${formatCurrency(bill.amount)} <span style="color:#666; font-size:0.85em;">(Issued: ${bill.issueDate})</span>${softcopyLink}`;
                      billsList.appendChild(li);
                  });
 
@@ -539,31 +542,86 @@ function bindBillForm() {
     const form = document.getElementById('bill-form');
     if (!form) return;
 
+    // Handle Cancel Edit
+    const cancelBtn = document.getElementById('bill-cancel-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            editingBillId = null;
+            form.reset();
+            document.getElementById('bill-submit-btn').textContent = "Save Bill";
+            cancelBtn.style.display = 'none';
+            document.getElementById('current-bill-file').style.display = 'none';
+        });
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const status = document.getElementById('bill-form-status');
-        status.textContent = "Saving...";
+        status.textContent = "Processing...";
         status.style.color = "blue";
 
         const month = document.getElementById('bill-month').value;
         const year = document.getElementById('bill-year').value;
         const amount = document.getElementById('bill-amount').value;
         const date = document.getElementById('bill-date').value;
+        const fileInput = document.getElementById('bill-softcopy');
+        const file = fileInput.files[0];
 
         try {
-            const bill = new window.Models.Bill(month, year, amount, date);
-            await window.db.collection('bills').doc(bill.id).set(bill.toFirestore());
+            let billUrl = "";
+            
+            // Check if we are editing and have an existing URL (if no new file)
+            // But simplify: always try upload if file exists.
+            if (file) {
+                 status.textContent = "Uploading Softcopy...";
+                 if (window.DriveService) {
+                     billUrl = await window.DriveService.uploadFile(file);
+                 } else {
+                     console.warn("DriveService not available");
+                 }
+            } else if (editingBillId) {
+                // Keep existing URL if editing and no new file uploaded
+                // We need to fetch the existing doc to know the URL or store it in dataset when clicking edit
+                // For simplicity, we'll fetch it or rely on a global lookup if we cached it.
+                // Better approach: fetch current doc to preserve URL if not overwritten
+                const oldDoc = await window.db.collection('bills').doc(editingBillId).get();
+                if(oldDoc.exists) {
+                    billUrl = oldDoc.data().billUrl || "";
+                }
+            }
+
+            const bill = new window.Models.Bill(month, year, amount, date, billUrl);
+            // If editing, preserve ID and createdAt
+            if (editingBillId) {
+                bill.id = editingBillId; 
+                // We need to keep original createdAt. 
+                // Ideally Model should handle this via a static 'fromFirestore' or similar, 
+                // but let's just merge update.
+                const updateData = bill.toFirestore();
+                delete updateData.createdAt; // Don't overwrite creation date
+                await window.db.collection('bills').doc(editingBillId).set(updateData, { merge: true });
+                status.textContent = "Bill Updated!";
+            } else {
+                await window.db.collection('bills').doc(bill.id).set(bill.toFirestore());
+                status.textContent = "Bill Saved!";
+            }
             
             // Recalculate Global Stats
             await calculateGlobalBreakEven();
 
-            status.textContent = "Bill Saved!";
-            status.style.color = "green";
+            status.style.color = "var(--success-color)";
             form.reset();
+            
+            // Reset Edit Mode
+            editingBillId = null;
+            document.getElementById('bill-submit-btn').textContent = "Save Bill";
+            if(cancelBtn) cancelBtn.style.display = 'none';
+            document.getElementById('current-bill-file').style.display = 'none';
+            
             fetchBills(); // Refresh list
         } catch (error) {
             console.error(error);
-            status.textContent = "Error saving bill.";
+            status.textContent = "Error saving bill: " + error.message;
             status.style.color = "red";
         }
     });
@@ -578,27 +636,75 @@ async function fetchBills() {
         tbody.innerHTML = '';
         
         if (snapshot.empty) {
-            tbody.innerHTML = '<tr><td colspan="5">No bills recorded.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">No bills recorded.</td></tr>';
             return;
         }
 
         snapshot.forEach(doc => {
             const bill = doc.data();
+            const softcopyLink = bill.billUrl 
+                ? `<a href="${bill.billUrl}" target="_blank">View File</a>` 
+                : '<span style="color:#ccc">N/A</span>';
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${bill.month}</td>
                 <td>${bill.year}</td>
                 <td>${formatCurrency(bill.amount)}</td>
                 <td>${bill.issueDate}</td>
+                <td>${softcopyLink}</td>
                 <td>
-                    <button type="button" class="delete-bill-btn" data-id="${doc.id}">Delete</button>
-                    <!-- Edit not fully implemented in this snippet -->
+                    <button type="button" class="edit-btn edit-bill-btn" data-id="${doc.id}">Edit</button>
+                    <button type="button" class="delete-btn delete-bill-btn" data-id="${doc.id}">Delete</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+        
+        // Bind Edit Buttons
+        document.querySelectorAll('.edit-bill-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = e.target.getAttribute('data-id');
+                loadBillForEdit(id);
+            });
+        });
+
     } catch (e) {
         console.error("Fetch bills error", e);
+    }
+}
+
+async function loadBillForEdit(id) {
+    try {
+        const doc = await window.db.collection('bills').doc(id).get();
+        if(!doc.exists) return;
+        
+        const data = doc.data();
+        document.getElementById('bill-month').value = data.month;
+        document.getElementById('bill-year').value = data.year;
+        document.getElementById('bill-amount').value = data.amount;
+        document.getElementById('bill-date').value = data.issueDate;
+        
+        editingBillId = id;
+        document.getElementById('bill-submit-btn').textContent = "Update Bill";
+        
+        const fileInfo = document.getElementById('current-bill-file');
+        if(data.billUrl) {
+            fileInfo.style.display = 'block';
+            fileInfo.innerHTML = `Current File: <a href="${data.billUrl}" target="_blank">View</a>`;
+        } else {
+            fileInfo.style.display = 'none';
+        }
+        
+        const cancelBtn = document.getElementById('bill-cancel-btn');
+        if(cancelBtn) cancelBtn.style.display = 'inline-block';
+        
+        // Scroll to form
+        document.getElementById('bill-form').scrollIntoView({ behavior: 'smooth' });
+        
+    } catch(e) {
+        console.error(e);
+        alert("Error loading bill details");
     }
 }
 

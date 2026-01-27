@@ -30,12 +30,13 @@ class Unit {
  * Represents a monthly utility bill.
  */
 class Bill {
-    constructor(month, year, amount, issueDate) {
+    constructor(month, year, amount, issueDate, billUrl = "") {
         this.month = Number(month); // Ensure Number for correct sorting
         this.year = Number(year);   // Ensure Number for correct sorting
         this.id = `${this.year}-${this.month}`; // Unique ID: "2023-11"
         this.amount = Number(amount);
         this.issueDate = issueDate; // String YYYY-MM-DD or Timestamp
+        this.billUrl = billUrl;
         this.createdAt = new Date();
     }
 
@@ -45,6 +46,7 @@ class Bill {
             year: this.year,
             amount: this.amount,
             issueDate: this.issueDate,
+            billUrl: this.billUrl,
             createdAt: this.createdAt
         };
     }
