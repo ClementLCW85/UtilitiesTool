@@ -32,6 +32,7 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Break-Even Threshold:** The bar chart must include a **threshold line** representing the **Cumulative Break-Even Point** (Total amount of all utilities bills issued to date). This indicates the target "Zero Debt" level for the block.
 - **Highlighted Units:** The dashboard must visually distinguish specific units (e.g., different bar color or icon) that have special status (e.g., financial hardship, deceased owner). A public note should be visible for these highlighted units to explain the status.
 - **Pending Payments Visualization:** The bar chart must visually distinguish **Pending Payments** (e.g., dotted outline or separate color block) stacked on top of the confirmed amount to indicate potential incoming funds.
+- **Bill History View:** The public dashboard must allow users to view the list of electric bills. To maintain readability, this list should display the **10 most recent bills** by default, with pagination controls to access older records.
 - **Transparency:** The data should be presented clearly so owners can verify their total contributions against the recorded electric account.
 
 ### 3.4 Administration (Restricted Access)
@@ -64,6 +65,9 @@ The goal is to develop a web-based application to manage and track the collectio
 - **Public Dashboard:**
     - **Active Round:** Display the details of the latest/current collection round.
     - **History:** Provide a view to list past collection rounds for transparency.
+
+### 3.6 System Customization
+- **Dashboard Text:** Admins can customize the main title text displayed on the public dashboard.
 
 ## 4. Next Steps
 This requirements document will be used to generate the **Product Backlog** and strictly guide the **Feature Design** phase.
