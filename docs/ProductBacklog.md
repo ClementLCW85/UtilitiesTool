@@ -1,0 +1,74 @@
+# Product Backlog: Seapark Apartment Block E - Utilitybill Tracker
+
+## 1. Epic: Infrastructure & Core Setup
+**Goal:** Establish the hosting, database, and security foundation.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| INF-1 | Set up Repository & Hosting | Initialize Git repo and configure automated deployment to GitHub Pages (or Vercel). | High | - | Done |
+| INF-2 | Database Connection Setup | Configure connection to Google Sheets (via API or published CSV) or Firebase Realtime DB (Free Tier). | High | INF-1 | Done |
+| INF-3 | Admin Authentication | Implement a simple "Master Password" login screen to protect the Admin Interface. | High | INF-1 | Done |
+| INF-4 | Define Data Models | Design JSON/Schema structure for `Units`, `Bills`, and `Payments`. | High | INF-2 | Done |
+
+## 2. Epic: Monthly Bill Management (Admin)
+**Goal:** Allow administrators to input and track the monthly utility bills.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| BILL-1 | Record New Bill | Form for Admin to input: Month, Year, Total Amount, Issue Date. | High | INF-3, INF-4 | Done |
+| BILL-2 | Bill History View | List view of all recorded bills with ability to edit/delete distinct records. | Medium | BILL-1 | Done |
+| BILL-3 | Auto-Calculate Global Break-Even | System updates the "Global Break-Even Threshold" (Cumulative Total of All Bills) whenever a bill is added/modified. | High | BILL-1 | Done |
+| BILL-4 | Bill Softcopy Upload | Allow Admin to upload/attach PDF/Image of the bill to the record. Update Edit form to support this. | Medium | BILL-1, PAY-2 | Done |
+
+## 3. Epic: Owner Payment Management (Admin)
+**Goal:** Enable recording of unit contributions.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| PAY-1 | Record Unit Payment | Form for Admin to select Unit (1-44), Input Amount, Date, and Optional Reference Note. | High | INF-3, INF-4 | Done |
+| PAY-2 | Receipt Image Upload | File upload interface to select image/pdf. System handles upload to Google Drive via API and retrieves web view link. | High | PAY-1 | Done |
+| PAY-3 | Payment History per Unit | Admin view to see ledger of payments for a specific unit. | Medium | PAY-1 | Done |
+| PAY-4 | Public Payment Submission | Interface for residents to submit payment records and upload receipts. | High | PAY-2 | Done |
+| PAY-5 | Seamless Public Upload (GAS Proxy) | Implement Google Apps Script proxy to allow public uploads without user Google Auth. | High | PAY-4 | Done |
+| PAY-6 | Payment Removal & Archiving | Admin capability to archive records (remove from totals) and permanently delete them from archive. | High | PAY-1 | Done |
+| PAY-7 | Admin Approval Queue | Admin UI to view "Pending" public payments. Features: Edit Amount/Ref, Approve (Move to Active), Reject (Move to Archive). | High | PAY-4 | Done |
+| PAY-8 | Rejected Payment Archiving | Store rejected payments in `archived_payments` with a specific flag. Admin can filter Archive view to see "Rejected" vs "Deleted". | Medium | PAY-7, PAY-6 | Done |
+
+## 4. Epic: Public Dashboard & Visualization
+**Goal:** Transparently display contributions and status to all users.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| DASH-1 | Dashboard Layout & Data Fetching | Main landing page that fetches and aggregates Bill and Payment data on load. | High | INF-2, INF-4 | Done |
+| DASH-2 | Unit Bar Chart Component | Implement a bar chart displaying "Total Contributed" per Unit (1-44). | High | DASH-1, PAY-1 | Done |
+| DASH-3 | Global Break-Even Threshold Line | **Logic Clarification required:** Add a horizontal line across the chart. <br> *Decision:* Line represents (Total Cumulative Bills / 44 Units) to show "Target per Unit". <br> *Alt:* If chart is aggregate, line is Total Bills. | High | DASH-2, BILL-3 | Done |
+| DASH-4 | Highlighted Unit Status | Visual indicator (color/icon) for specific units flagged as "Special Case" (e.g., Hardship). Display public note on hover/click. | Medium | DASH-2, ADM-1 | Done |
+| DASH-5 | Mobile Responsiveness | Ensure chart and data tables are readable on mobile devices. | Medium | DASH-1 | Done |
+| DASH-6 | Chart Enhancements | Add "Contributions per Unit" title, Axis Titles (Y: RM, X: Units), and enable Public Note tooltip on X-axis labels. | Medium | DASH-2 | Done |
+| DASH-7 | Layout & Context | Move Chart to Top. Add text explaining "Beginning Date" and cumulative nature of stats. | High | DASH-1 | Done |
+| DASH-8 | Pending Payment Visualization | Update Bar Chart to show Pending Payments as a stacked, dotted/lighter bar segment on top of confirmed contributions. | High | DASH-2, PAY-7 | Done |
+| DASH-9 | View Bill Details | Ability for public users to view the list of electric bills used for the global break-even calculation. | Medium | DASH-1 | Done |
+| DASH-10 | Bill Details Pagination | Limit list to latest 10; add pagination for older records. | High | DASH-9 | Pending |
+
+## 5. Epic: Unit & System Administration
+**Goal:** Manage unit status and system configuration.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| ADM-1 | Unit Status Management | Admin interface to toggle "Highlighted" status for a unit and edit the associated Public Note. | Medium | INF-3, INF-4 | Done |
+| ADM-2 | Manual Threshold Override | Option for Admin to manually set the Threshold Line value (overriding the auto-sum) if needed for adjustments. | Low | DASH-3 | Done |
+| ADM-3 | Data Export | Button to download current state (bills/payments) as JSON/CSV for backup. | Low | BILL-1, PAY-1 | Done |
+| ADM-4 | Unclaimed Funds Management | Admin interface to set a floating "Unclaimed" amount (payments not linked to units). visualized as a special unit in Dashboard. | High | ADM-2 | Done |
+| ADM-5 | Detailed Unclaimed Funds | Enhancement to ADM-4. Track unclaimed funds as individual records (Date, Amount, Remarks). Allow conversion to valid Unit Payment or Archiving. | High | ADM-4 | Done |
+| ADM-6 | Admin UI Segmentation | Reorganize Admin Dashboard into tabbed sections (Bills, Payments, Unclaimed, Units, System) to reduce scrolling. | Medium | INF-3 | Done |
+| ADM-7 | Theme Customization | Admin interface to select primary/secondary colors for the Public and Admin dashboards. | Low | INF-1 | Done |
+| ADM-8 | Dashboard Title Configuration | Admin interface to update the main title text displayed on the Public Dashboard. | Low | INF-1 | Pending |
+
+## 6. Epic: Collection Rounds Management
+**Goal:** Manage and visualize specific fundraising rounds.
+
+| ID | Title | Description | Priority | Dependencies | Status |
+|----|-------|-------------|----------|--------------|--------|
+| COL-1 | Define Collection Round (Admin) | Form to Create/Edit a Round: Title, Amount, Start Date, Remarks, and Participating Units (Multi-select). | High | INF-4 | Done |
+| COL-2 | Collection Round Visualization (Public) | Dashboard component to show the Latest Round details and a clickable list/modal for History. | High | COL-1 | Done |
+| COL-3 | Extended Round Details | Add Description text, Avg Cost/Unit, Participant Count, and Toggleable Unit List to widget. | High | COL-2 | Done |
