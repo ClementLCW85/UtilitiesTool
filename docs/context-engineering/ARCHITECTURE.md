@@ -153,6 +153,23 @@ User Click -> Event Listener (app.js) -> Validator (app.js/models.js) -> Service
 ### Security
 - **Auth:** Firebase Auth (Admin), Anonymous (Public).
 - **Rules:** Firestore Security Rules (Managed via Firebase Console).
+  - **Applied Rules (2026-03-04):**
+    ```javascript
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        function isAdmin() {
+          return request.auth != null && request.auth.token.email == "wei91my@gmail.com";
+        }
+        match /units/{unitId} { allow read: if true; allow write: if isAdmin(); }
+        match /bills/{billId} { allow read: if true; allow write: if isAdmin(); }
+        match /collection_rounds/{roundId} { allow read: if true; allow write: if isAdmin(); }
+        match /pending_payments/{paymentId} { allow create: if true; allow read, update, delete: if isAdmin(); }
+        match /unclaimed_funds/{recordId} { allow read: if true; allow write: if isAdmin(); }
+        match /system/settings { allow read: if true; allow write: if isAdmin(); }
+      }
+    }
+    ```
 - **Secrets:** API Keys (Publicly visible but domain-restricted via Google Console).
 
 ### Performance
@@ -161,5 +178,5 @@ User Click -> Event Listener (app.js) -> Validator (app.js/models.js) -> Service
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2024-05-24
+**Version:** 1.0.1
+**Last Updated:** 2026-03-04

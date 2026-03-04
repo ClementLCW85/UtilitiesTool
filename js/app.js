@@ -17,84 +17,61 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Auth Module (window.auth) not found. Check js/auth.js loading.");
     }
 
-    // Check for Unit initialization (One-time check for development/first run)
-    // In production, this might be triggered manually by Admin
-    if (window.Models && window.Models.SchemaService) {
-        // Auto-check on load (Safe because it checks if valid non-empty collection exists first)
-        window.Models.SchemaService.initUnits().catch(err => console.error("Init Error:", err));
-    }
-
     // Navigation Logic
     handleNavigation();
     window.addEventListener('hashchange', handleNavigation);
 
-    // Initial Dashboard Load
-    if (!window.location.hash || window.location.hash === '#dashboard') {
-        loadDashboardData();
-    }
-    
-    // Bind Chart Controls
+    // Initial Bindings
     bindChartEvents();
-
-    // Bind Bill Form Logic
     bindBillForm();
-
-    // Bind Payment Form Logic
     bindPaymentForm();
-
-    // Bind Public Payment Form Logic
     bindPublicPaymentForm();
-    
-    // Populate UnitsDropdown
     populateUnitDropdown();
-
-    // Bind Bill History Table Events
     bindBillHistoryEvents();
-
-    // Bind Payment History Logic
     bindPaymentHistoryEvents();
-
-    // Bind Unit Status Management
     bindUnitManagement();
-
-    // Bind Threshold Override
     bindThresholdManagement();
-
-    // Bind Unclaimed Funds
     bindUnclaimedManagement();
-
-    // Bind Data Export
     bindDataExport();
-
-    // Bind Archive Management
     bindArchiveEvents();
-
-    // Bind Collection Rounds Management
     bindCollectionRoundManagement();
-
-    // Bind Public Round History
     bindRoundHistoryEvents();
-
-    // Bind Admin UI Tabs
     bindAdminTabs();
-
-    // Bind Theme Management
     bindThemeManagement();
-    
-    // Load System Settings
-    loadSystemSettings();
 
-    // Listen for Auth to fetch data
+    // Listen for Auth to fetch data and refresh view
     if (window.firebase) {
         window.firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                console.log("Auth session confirmed. Fetching user-dependent data...");
+
+                // Load system settings with auth context
+                loadSystemSettings();
+
+                // Check for Unit initialization (One-time check for development/first run)
+                if (window.Models && window.Models.SchemaService) {
+                    window.Models.SchemaService.initUnits().catch(err => console.error("Init Error:", err));
+                }
+
+                // Fetch core data
                 fetchBills();
                 fetchCollectionRounds();
                 fetchPendingPayments();
+
+                // Force refresh dashboard with auth context
+                if (!window.location.hash || window.location.hash === '#dashboard') {
+                    loadDashboardData();
+                }
             } else {
+                console.log("No auth session. Attempting public dashboard load...");
                 // Clear table on logout
                 const tbody = document.querySelector('#bill-history-table tbody');
                 if (tbody) tbody.innerHTML = '';
+
+                // Load public dashboard (might fail if rules or API are locked)
+                if (!window.location.hash || window.location.hash === '#dashboard') {
+                    loadDashboardData();
+                }
             }
         });
     }

@@ -203,7 +203,9 @@ const SchemaService = {
             }
         } catch (error) {
             console.error("Init Error:", error);
-            if (error && (error.code === 'permission-denied' || error.message.includes("Cloud Firestore API has not been used"))) {
+            if (error && (error.code === 'permission-denied')) {
+               console.warn("Permission Denied: Please check Firestore Security Rules. Ensure you are signed in as an authorized user.");
+            } else if (error && error.message.includes("Cloud Firestore API has not been used")) {
                console.warn("API Not Enabled: Please enable Cloud Firestore in the Firebase Console and Create the Database.");
             }
         }

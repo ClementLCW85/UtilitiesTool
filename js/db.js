@@ -8,17 +8,25 @@
     // Initialize Firebase
     const app = firebase.initializeApp(window.firebaseConfig);
     const db = firebase.firestore();
-    // Enable offline persistence if possible
-    db.enablePersistence()
-        .catch((err) => {
-            if (err.code == 'failed-precondition') {
-                 // Multiple tabs open, persistence can only be enabled in one tab at a a time.
-                 console.warn("Firebase persistence failed: Multiple tabs open");
-            } else if (err.code == 'unimplemented') {
-                 // The current browser does not support all of the features required to enable persistence
-                 console.warn("Firebase persistence failed: Browser not supported");
-            }
+
+    // Enable persistence with modern FirestoreSettings.cache (resolves deprecation warning)
+    try {
+        db.settings({
+            cache: firebase.firestore.persistentLocalCache({
+                tabManager: firebase.firestore.persistentSingleTabManager()
+            })
         });
+    } catch (err) {
+        if (err.code == 'failed-precondition') {
+             // Multiple tabs open, persistence can only be enabled in one tab at a time.
+             console.warn("Firebase persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+             // The current browser does not support all of the features required to enable persistence
+             console.warn("Firebase persistence failed: Browser not supported");
+        } else {
+             console.error("Firebase settings error:", err);
+        }
+    }
 
     // Validating Config
     const isMock = window.firebaseConfig.projectId === "YOUR_PROJECT_ID";
