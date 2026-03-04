@@ -269,5 +269,35 @@ Centralize all external endpoints and configuration in `js/config.js`.
 
 ---  
 
-**Version: 1.1.0**  
-**Last Updated: 2024-05-24**  
+---
+
+## Development Workflow Anti-Patterns
+
+### AP-400: Committing Unformatted Code
+
+**Category:** Code Quality / Maintainability
+
+**What it is:**
+Committing code without running the project's formatting script, resulting in inconsistent line endings (LF vs CRLF) and indentation (tabs vs spaces).
+
+**Why it's bad:**
+- Creates unnecessary diff noise in PRs (whitespace changes mixed with actual logic changes).
+- Cross-platform development issues (Windows CRLF vs Unix LF).
+- Inconsistent code style reduces readability.
+
+**What to do instead:**
+Always run the formatting script before committing:
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/format_files.ps1
+```
+
+**What the script enforces:**
+| File Type | Line Endings | Indentation |
+|-----------|--------------|-------------|
+| Markdown (`.md`) | CRLF | 4 spaces |
+| JavaScript (`.js`) | CRLF | 2 spaces |
+
+---
+
+**Version: 1.2.0**  
+**Last Updated: 2026-03-04**  
