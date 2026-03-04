@@ -1,10 +1,10 @@
 # Sprint Log & History: Seapark Apartment Block E - Utility Bill Tracker
 
 ## 📊 Project Statistics
-- **Total User Stories:** 35  
-- **Completed Stories:** 35  
-- **Remaining Backlog:** 0  
-- **Project Status:** Maintenance / Completed  
+- **Total User Stories:** 37  
+- **Completed Stories:** 36  
+- **Remaining Backlog:** 1  
+- **Project Status:** 🏃 SPR-02 Enhancement Sprint
 
 ## 📈 Velocity Tracking
 | Sprint ID | Name | Stories Completed | Points (Est.) | Status |
@@ -22,9 +22,11 @@
 **Status:** 🏃 In Progress
 **Goal:** Enhance dashboard usability with pagination for bill details and admin configurability for the dashboard title.
 
+**Progress:** 1 / 2 Stories Completed (50%)
+
 **Committed Items:**
-- **[DASH-10]** Bill Details Pagination
-- **[ADM-8]** Dashboard Title Configuration
+- **[DASH-10]** Bill Details Pagination ✅ Done
+- **[ADM-8]** Dashboard Title Configuration 🏃 In Progress
 
 ---
 

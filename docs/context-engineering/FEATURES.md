@@ -18,7 +18,7 @@
 
 | Feature ID | Description | Owner | Complexity | Status |
 |------------|-------------|-------|------------|--------|
-| **DASH-10** | Bill Details Pagination | UI | 1 | Pending |
+| **DASH-10** | Bill Details Pagination | UI | 1 | Done |
 | **ADM-8** | Dashboard Title Configuration | Admin | 1 | Pending |
 
 ---
@@ -29,7 +29,7 @@
 **Owner:** UI  
 **Complexity:** 1  
 **Priority:** High  
-**Status:** Pending  
+**Status:** Done  
 
 **Description:**  
 Limit list to latest 10; add pagination for older records.
@@ -38,9 +38,9 @@ Limit list to latest 10; add pagination for older records.
 As a Resident, I want to see only recent bills by default, so the interface is not cluttered.
 
 **Acceptance Criteria:**
-- [ ] List restricted to 10 latest bills initially.
-- [ ] "Load More" or Pagination button implemented.
-- [ ] Fetches or reveals older records when requested.
+- [x] List restricted to 10 latest bills initially.
+- [x] "Load More" or Pagination button implemented.
+- [x] Fetches or reveals older records when requested.
 
 ### Technical Scope
 **Affected Layers:** UI
@@ -48,8 +48,8 @@ As a Resident, I want to see only recent bills by default, so the interface is n
 **Dependencies:** DASH-9
 
 ### Test Requirements
-- [ ] E2E tests for: Pagination flow
-- [ ] Manual Check: List limit accuracy
+- [x] E2E tests for: Pagination flow
+- [x] Manual Check: List limit accuracy
 
 ### Estimated Effort
 **Time:** 2 Hours
