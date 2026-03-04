@@ -9,7 +9,7 @@
 4. **IMPORTANT**: When constructing the `git commit` command, avoid using characters that may break the shell command line (like unescaped quotes or specific special characters causing parsing errors). If complex messages or special characters (like `:`) are needed, prefer writing the message to a temporary file (e.g., `.git-commit-msg`) and using `git commit -F .git-commit-msg` to ensure safety and correctness.
 5. After committing, push the changes to the remote repository (origin/master).
 6. Ensure all markdown files use CRLF line endings and spaces for indentation as per project rules.
-7. Consult `DESIGN.md` Section 8 (Feature Log) and append a summary of currently available features to the commit message as required by `.github/copilot-instructions.md`.
+7. Consult `docs/context-engineering/FEATURES.md` and `docs/context-engineering/ARCHITECTURE.md` to append a summary of currently available features to the commit message as required by `.github/copilot-instructions.md`.
 
 **Use a standard LLM in Agent Mode for this task to ensure git commands are executed sequentially.**
 

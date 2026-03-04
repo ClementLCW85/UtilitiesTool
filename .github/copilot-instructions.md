@@ -35,7 +35,7 @@ Seapark Apartment Block E Utility Tracker is an HTML/JavaScript web application 
 ## Core Rules
 1. **Feature Logging:** Every time you generate a commit message, pull request description, or build log summary, you **MUST** consult the `docs/context-engineering/FEATURES.md` file, and append a brief summary of the *currently available features* to your output.
 2. **Design Consistency:** When implementing new features, verify that the implementation aligns with the `Layer Responsibilities` and `Data Flow` defined in `docs/context-engineering/ARCHITECTURE.md`. If a deviation is required (refactoring), you must update `docs/context-engineering/ARCHITECTURE.md` first.
-3. **Feature Flag updates:** When a User Story (e.g., "PAY-1") is completed: 1. Update `docs/ProductBacklog.md` (Status) and `docs/SprintLog.md` (Progress). 2. Update `docs/context-engineering/FEATURES.md` to mark the feature as "Available".
+3. **Feature Flag updates:** When a User Story (e.g., "PAY-1") is completed: 1. Update `docs/ProductBacklog.md` (Status) and `docs/SprintLog.md` (Progress). 2. Update `docs/context-engineering/FEATURES.md` to mark the feature as "Done".
 4. **File Creation Robustness:** Use `Set-Content` in PowerShell to create files, ensuring robustness in the environment.
 5. **No Compilation:** This project does not require a `run_build` or compilation step in its plans.
 
@@ -57,13 +57,16 @@ Seapark Apartment Block E Utility Tracker is an HTML/JavaScript web application 
 - **Detailed Stack:** docs/context-engineering/TECH_STACK.md
 - **Architecture Deep Dive:** docs/context-engineering/ARCHITECTURE.md
 - **Anti-Patterns:** docs/context-engineering/ANTI_PATTERNS.md
+- **Code Formatting:** Run `tools/format_files.ps1` before commits (enforces CRLF/4-space for MD, CRLF/2-space for JS)
 
 ---
 
-## Participants to Use
+## Participants to Use (GitHub Copilot Chat Specific)
 - **@workspace** - For solution-wide questions
 - **@terminal** - For Git/command-line help
 - **#file** - To reference specific files
+
+> *Note: These participant syntaxes are specific to GitHub Copilot Chat and may not be available in other AI coding assistants.*
 
 ---
 
