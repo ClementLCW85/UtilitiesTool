@@ -264,25 +264,51 @@ async function loadDashboardData() {
         const billsList = document.getElementById('dashboard-bills-list');
         const billsToggle = document.getElementById('toggle-dashboard-bills');
         const billsDetails = document.getElementById('dashboard-bills-details');
+        const loadMoreContainer = document.getElementById('load-more-bills-container');
+        const loadMoreBtn = document.getElementById('load-more-bills-btn');
 
         if (billsWrapper && billsList) {
              if (allBills.length > 0) {
                  billsWrapper.style.display = 'block';
                  billsList.innerHTML = '';
-                 
+
                  // Sort descending for display
                  const sortedBills = [...allBills].sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate));
                  const monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-                 sortedBills.forEach(bill => {
-                     const li = document.createElement('li');
-                     const mName = (bill.month && monthNames[bill.month]) ? monthNames[bill.month] : 'Unknown';
-                     const softcopyLink = bill.billUrl 
-                        ? ` <a href="${bill.billUrl}" target="_blank" style="font-size: 0.8em; margin-left: 5px;">[View Bill]</a>` 
-                        : '';
-                     li.innerHTML = `<strong>${mName} ${bill.year || ''}:</strong> ${formatCurrency(bill.amount)} <span style="color:#666; font-size:0.85em;">(Issued: ${bill.issueDate})</span>${softcopyLink}`;
-                     billsList.appendChild(li);
-                 });
+                 // Pagination Settings
+                 const PAGE_SIZE = 10;
+                 let billsShown = 0;
+
+                 const renderNextPage = () => {
+                    const nextBatch = sortedBills.slice(billsShown, billsShown + PAGE_SIZE);
+                    nextBatch.forEach(bill => {
+                        const li = document.createElement('li');
+                        const mName = (bill.month && monthNames[bill.month]) ? monthNames[bill.month] : 'Unknown';
+                        const softcopyLink = bill.billUrl 
+                           ? ` <a href="${bill.billUrl}" target="_blank" style="font-size: 0.8em; margin-left: 5px;">[View Bill]</a>` 
+                           : '';
+                        li.innerHTML = `<strong>${mName} ${bill.year || ''}:</strong> ${formatCurrency(bill.amount)} <span style="color:#666; font-size:0.85em;">(Issued: ${bill.issueDate})</span>${softcopyLink}`;
+                        billsList.appendChild(li);
+                    });
+                    billsShown += nextBatch.length;
+
+                    // Show/Hide Load More
+                    if (loadMoreContainer) {
+                        loadMoreContainer.style.display = (billsShown < sortedBills.length) ? 'block' : 'none';
+                    }
+                 };
+
+                 // Initial Render
+                 renderNextPage();
+
+                 // Bind Load More
+                 if (loadMoreBtn) {
+                     loadMoreBtn.onclick = (e) => {
+                         e.preventDefault();
+                         renderNextPage();
+                     };
+                 }
 
                  // Bind Toggle
                  const newToggle = billsToggle.cloneNode(true);

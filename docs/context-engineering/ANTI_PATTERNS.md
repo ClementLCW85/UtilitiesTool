@@ -86,11 +86,60 @@ getData(function(a) {
 ```javascript
 // ✅ GOOD
 const a = await getData();
-const b = await getMore(a);
-render(b);
-```
+const b = await getMore(a);  
+render(b);  
+```  
 
----
+---  
+
+### AP-103: Inline Style Manipulation  
+
+**Category:** Presentation  
+
+**What it is:**  
+Using JavaScript to directly modify `.style` properties (e.g., `element.style.color = 'red'`) instead of toggling CSS classes.  
+
+**Why it's bad:**  
+- Breaks separation of concerns (styling in logic).  
+- Harder to maintain theme consistency.  
+- Overrides CSS stylesheet declarations due to high specificity.  
+
+**What to do instead:**  
+Define states in CSS and use `element.classList.add()` or `toggle()`.  
+
+---  
+
+### AP-104: Silent Error Catching  
+
+**Category:** User Experience / Debugging  
+
+**What it is:**  
+Using `try/catch` blocks that only log to `console.error` without informing the user that an operation failed.  
+
+**Why it's bad:**  
+- Users are left wondering why a button click "did nothing".  
+- Difficult to troubleshoot in production without access to client logs.  
+
+**What to do instead:**  
+Always provide UI feedback (e.g., Toast notifications, error messages) in the `catch` block.  
+
+---  
+
+### AP-105: Prohibited DOM Access in Models  
+
+**Category:** Architecture  
+
+**What it is:**  
+Referencing `document` or specific DOM elements inside classes defined in `models.js`.  
+
+**Why it's bad:**  
+- Couples data structure to a specific UI implementation.  
+- Prevents unit testing of models in non-browser environments (like Node.js).  
+
+**What to do instead:**  
+Models should only hold data and pure logic. DOM updates belong in `app.js`.  
+
+---  
 
 ## Firebase / Backend Anti-Patterns
 
@@ -148,11 +197,27 @@ const unpayed = allBills.filter(b => !b.paid);
 **Correct Approach:**
 ```javascript
 // ✅ GOOD
-const q = query(collection(db, "bills"), where("paid", "==", false));
-const unpayed = await getDocs(q);
-```
+const q = query(collection(db, "bills"), where("paid", "==", false));  
+const unpayed = await getDocs(q);  
+```  
 
----
+---  
+
+### AP-203: Firestore N+1 Read Queries  
+
+**Category:** Performance & Cost  
+
+**What it is:**  
+Performing a database read (e.g., `getDoc`) inside a loop that iterates over the results of another query.  
+
+**Why it's bad:**  
+- **Cost:** Exponential increase in document reads.  
+- **Latency:** Multiple sequential network roundtrips slow down the UI rendering.  
+
+**What to do instead:**  
+Use `where("field", "in", [...])` for batch lookups or denormalize data to include necessary fields in the parent document.  
+
+---  
 
 ### AP-202: Publicly Writable Collections (in Rules)
 
@@ -184,9 +249,25 @@ Doing complex data work (image processing, big loops) inside the `doPost` web ap
 - Client browser hangs waiting for response.
 
 **What to do instead:**
-Quickly save raw data and return "OK". Use time-driven triggers for heavy processing.
+Quickly save raw data and return "OK". Use time-driven triggers for heavy processing.  
 
----
+---  
 
-**Version:** 1.0.0
-**Last Updated:** 2024-05-24
+### AP-301: Hardcoded External Service URLs  
+
+**Category:** Maintainability  
+
+**What it is:**  
+Embedding the Google Apps Script Web App URL or Firebase Project IDs directly in application logic files.  
+
+**Why it's bad:**  
+- Switching from dev to production requires editing multiple files.  
+- High risk of pointing to the wrong environment after a redeploy.  
+
+**What to do instead:**  
+Centralize all external endpoints and configuration in `js/config.js`.  
+
+---  
+
+**Version: 1.1.0**  
+**Last Updated: 2024-05-24**  
