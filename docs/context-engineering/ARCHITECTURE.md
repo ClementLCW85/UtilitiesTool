@@ -158,16 +158,21 @@ User Click -> Event Listener (app.js) -> Validator (app.js/models.js) -> Service
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
-        function isAdmin() {
-          return request.auth != null && request.auth.token.email == "wei91my@gmail.com";
+          function isAdmin() {
+            return request.auth != null && request.auth.token.email == "wei91my@gmail.com";
+          }
+
+          // Public and Dashboard-Related Collections (Read access for everyone)
+          match /units/{unitId} { allow read: if true; allow write: if isAdmin(); }
+          match /bills/{billId} { allow read: if true; allow write: if isAdmin(); }
+          match /collection_rounds/{roundId} { allow read: if true; allow write: if isAdmin(); }
+          match /unclaimed_records/{recordId} { allow read: if true; allow write: if isAdmin(); }
+          match /pending_payments/{paymentId} { allow read, create: if true; allow write: if isAdmin(); }
+          match /system/{docId} { allow read: if true; allow write: if isAdmin(); }
+
+          // Admin-Only Collections (Archived records, etc)
+          match /archived_unclaimed/{recordId} { allow read, write: if isAdmin(); }
         }
-        match /units/{unitId} { allow read: if true; allow write: if isAdmin(); }
-        match /bills/{billId} { allow read: if true; allow write: if isAdmin(); }
-        match /collection_rounds/{roundId} { allow read: if true; allow write: if isAdmin(); }
-        match /pending_payments/{paymentId} { allow create: if true; allow read, update, delete: if isAdmin(); }
-        match /unclaimed_funds/{recordId} { allow read: if true; allow write: if isAdmin(); }
-        match /system/settings { allow read: if true; allow write: if isAdmin(); }
-      }
     }
     ```
 - **Secrets:** API Keys (Publicly visible but domain-restricted via Google Console).
@@ -178,5 +183,5 @@ User Click -> Event Listener (app.js) -> Validator (app.js/models.js) -> Service
 
 ---
 
-**Version:** 1.0.1
-**Last Updated:** 2026-03-04
+**Version:** 1.0.2
+**Last Updated:** 2026-03-04 (Hotfix)
