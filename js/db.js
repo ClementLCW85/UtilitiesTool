@@ -11,21 +11,26 @@
 
     // Enable persistence with modern FirestoreSettings.cache (resolves deprecation warning)
     try {
-        db.settings({
-            cache: firebase.firestore.persistentLocalCache({
-                tabManager: firebase.firestore.persistentSingleTabManager()
-            })
-        });
-    } catch (err) {
-        if (err.code == 'failed-precondition') {
-             // Multiple tabs open, persistence can only be enabled in one tab at a time.
-             console.warn("Firebase persistence failed: Multiple tabs open");
-        } else if (err.code == 'unimplemented') {
-             // The current browser does not support all of the features required to enable persistence
-             console.warn("Firebase persistence failed: Browser not supported");
+        // Check for modern cache setting factory functions (capitalized in some compat versions)
+        const cacheFn = firebase.firestore.persistentLocalCache || firebase.firestore.PersistentLocalCache;
+        const tabMgrFn = firebase.firestore.persistentSingleTabManager || firebase.firestore.PersistentSingleTabManager;
+
+        if (cacheFn) {
+            db.settings({
+                cache: cacheFn({
+                    tabManager: tabMgrFn ? tabMgrFn() : undefined
+                })
+            });
         } else {
-             console.error("Firebase settings error:", err);
+            // Fallback for older versions or where cache settings are differently exposed
+            db.enablePersistence().catch(err => {
+                if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+                    console.warn("Firebase persistence error:", err);
+                }
+            });
         }
+    } catch (err) {
+        console.warn("Firebase settings error:", err);
     }
 
     // Validating Config
