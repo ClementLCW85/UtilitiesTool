@@ -1,34 +1,49 @@
 function doPost(e) {
   try {
     // 1. Get the data from the request
-    // expects JSON body: { "filename": "...", "mimeType": "...", "fileData": "base64..." }
     var data = JSON.parse(e.postData.contents);
     var filename = data.filename;
     var mimeType = data.mimeType;
     var base64Data = data.fileData;
-    // 2. Security & Config
-    // Hardcoded Folder ID (Receipts) to prevent arbitrary writes to other Admin folders.
-    // This ensures that even if the client is compromised, it cannot upload to sensitive folders.
-    // REPLACE WITH YOUR ACTUAL FOLDER ID found in js/config.js
+    
+    // 2. Input Validation - Ensure required fields are present
+    if (!filename || !base64Data || !mimeType) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error", 
+        message: "Missing required fields: filename, mimeType, or fileData"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 3. File Size Limit - Max 5MB (prevent storage abuse)
+    var decodedLength = Utilities.base64Decode(base64Data).length;
+    if (decodedLength > 5 * 1024 * 1024) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error", 
+        message: "File too large. Maximum size is 5MB."
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 4. Target Folder ID (Hardcoded for security - prevents arbitrary folder writes)
+    // To get ID, open folder in Drive, look at URL: folders/YOUR_ID_HERE
     var TARGET_FOLDER_ID = "1VY6uns6MEDtAJoWQ7kUgZf7xa44b1M6n"; 
     
-    // 3. Create Blob
+    // 5. Create the file from Base64
     var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, filename);
     var file;
-
-    // 4. Save File
-    // We strictly use the TARGET_FOLDER_ID. We do NOT use data.folderId from the request.
+    
+    // Save to target folder, fallback to root if folder fails
     try {
-      file = DriveApp.getFolderById(TARGET_FOLDER_ID).createFile(blob);
-    } catch (e) {
-      // Fallback only if the specific folder fails (e.g. deleted), though ideally we should fail safe.
-      // Creating in root is a safe fallback for visibility.
+      var folder = DriveApp.getFolderById(TARGET_FOLDER_ID);
+      file = folder.createFile(blob);
+    } catch (folderError) {
+      // Fallback: create in root if specific folder fails (e.g. deleted)
       file = DriveApp.createFile(blob);
     }
     
+    // 6. Set Permissions (Make it viewable by anyone with the link)
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     
-    // 4. Return the result
+    // 7. Return the result
     var result = {
       status: "success",
       url: file.getUrl(),
@@ -36,7 +51,6 @@ function doPost(e) {
       id: file.getId()
     };
     
-    // Return JSON
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
       
@@ -46,14 +60,3 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
-
-// Optional: specific folder version (commented out for reference)
-/*
-function doPostWithFolder(e) {
-    // ... parse data ...
-    var folderId = "YOUR_SPECIFIC_FOLDER_ID";
-    var folder = DriveApp.getFolderById(folderId);
-    var file = folder.createFile(blob);
-    // ... rest same ...
-}
-*/
