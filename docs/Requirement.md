@@ -69,5 +69,18 @@ The goal is to develop a web-based application to manage and track the collectio
 ### 3.6 System Customization
 - **Dashboard Text:** Admins can customize the main title text displayed on the public dashboard.
 
+### 3.7 PDF Report Generation
+- **Comprehensive Reports:** Admins can generate a PDF report containing all system data.
+- **Report Contents:**
+    - Executive Summary (Total Bills, Total Collected, Target Per Unit)
+    - All Monthly Bills (Month/Year, Amount, Issue Date)
+    - All Units Status (Unit Number, Total Contributed, Highlight Status)
+    - All Payment Records (Unit, Amount, Date, Reference)
+    - All Collection Rounds (Title, Target, Start Date, Participating Units)
+    - All Unclaimed Funds (Date, Amount, Remarks)
+- **Report Metadata:** Each report includes the generation date and time.
+- **Automatic Email Delivery:** Generated PDF reports are automatically emailed to the admin's registered email address (***REMOVED***).
+- **Local Download:** PDF reports are also downloaded locally for immediate access.
+
 ## 4. Next Steps
 This requirements document will be used to generate the **Product Backlog** and strictly guide the **Feature Design** phase.

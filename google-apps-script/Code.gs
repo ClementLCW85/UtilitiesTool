@@ -1,3 +1,19 @@
+/**
+ * Seapark Utility Tracker - Google Apps Script Backend
+ * 
+ * Required OAuth Scopes:
+ * @OnlyCurrentDoc
+ * 
+ * Additional required scopes for email functionality:
+ * https://www.googleapis.com/auth/gmail.send
+ * https://www.googleapis.com/auth/drive
+ * 
+ * To add these scopes:
+ * 1. Go to Project Settings (gear icon)
+ * 2. Enable "Show 'appsscript.json' manifest file in editor"
+ * 3. Add the gmail.send scope to the manifest
+ */
+
 function doPost(e) {
   try {
     // 1. Get the data from the request

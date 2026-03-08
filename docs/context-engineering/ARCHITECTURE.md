@@ -152,6 +152,10 @@ User Click -> Event Listener (app.js) -> Validator (app.js/models.js) -> Service
 
 ### Security
 - **Auth:** Firebase Auth (Admin), Anonymous (Public).
+- **Google Apps Script Permissions:**
+  - **Drive API:** Required for file uploads to Google Drive
+  - **Gmail API:** Required for sending PDF reports via email (`https://www.googleapis.com/auth/gmail.send`)
+  - OAuth scopes must be explicitly declared in `appsscript.json` manifest
 - **Rules:** Firestore Security Rules (Managed via Firebase Console).
   - **Applied Rules (2026-03-04):**
     ```javascript

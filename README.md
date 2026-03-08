@@ -18,10 +18,29 @@ This project is configured to be hosted on **GitHub Pages**.
 2. Open `index.html` in your browser.
 
 
+## Features
+
+### Public Dashboard
+- View total bills and contributions for all 44 units
+- Bar chart visualization with break-even threshold line
+- Filter by floor (Level 1-4)
+- View bill history with pagination
+- View collection rounds and unclaimed funds
+
+### Admin Interface (Password Protected)
+- **Monthly Bills Management:** Record, edit, and delete monthly electric bills
+- **Payment Management:** Record payments, approve public submissions, view payment history
+- **Unit Management:** Highlight special units, add public notes
+- **Collection Rounds:** Create and manage fundraising rounds
+- **Unclaimed Funds:** Track and convert unclaimed payments
+- **PDF Report Generation:** Generate comprehensive PDF reports with all data, auto-emailed to admin
+- **Data Export:** Download backup as JSON
+- **Theme Customization:** Customize dashboard colors
+
 ## Configuration
 
-### Google Drive Integration Setup (Required for Receipt Uploads)
-To enable the image upload feature, the system Admin must configure a Google Cloud Project:
+### Google Drive Integration Setup (Required for Receipt Uploads and Email)
+To enable the image upload feature and PDF email reports, the system Admin must configure a Google Cloud Project:
 
 1.  **Create a Project:**
         -   Go to [Google Cloud Console](https://console.cloud.google.com/).
@@ -88,3 +107,18 @@ Since functionality to "Sign Up" is not exposed in the UI (to prevent unauthoriz
 2. Go to the **Admin** tab.
 3. Enter the password you just created.
 4. If successful, you should see the Admin Dashboard.
+
+## PDF Report Generation
+
+Admins can generate comprehensive PDF reports that include:
+- Executive Summary (financial overview)
+- All monthly bills
+- All unit contributions
+- All payment records with dates
+- All collection rounds
+- All unclaimed funds
+
+**To enable email delivery:**
+1. Ensure the Google Apps Script is deployed with the Gmail OAuth scope (see `docs/DEPLOY_INSTRUCTIONS.md`)
+2. Reports will be automatically emailed to the admin email (***REMOVED***)
+3. Reports are also downloaded locally for immediate access
