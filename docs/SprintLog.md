@@ -22,11 +22,12 @@
 **Status:** 🏃 In Progress
 **Goal:** Enhance dashboard usability with pagination for bill details and admin configurability for the dashboard title.
 
-**Progress:** 1 / 2 Stories Completed (50%)
+**Progress:** 2 / 3 Stories Completed (66%)
 
 **Committed Items:**
 - **[DASH-10]** Bill Details Pagination ✅ Done
 - **[ADM-8]** Dashboard Title Configuration 🏃 In Progress
+- **[ADM-9]** PDF Report Generation ✅ Done
 
 ---
 
