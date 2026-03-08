@@ -678,6 +678,26 @@
                             </fieldset>
                         </div>
                     </section>
+
+                    <hr>
+                    <section id="report-generation-section">
+                        <h3>Generate Comprehensive Report</h3>
+                        <div class="admin-form">
+                            <fieldset>
+                                <legend>System Report</legend>
+                                <p class="small-note">Generate a PDF report containing all monthly bills, units, payments, collection rounds, and unclaimed funds.</p>
+                                <p class="small-note">Report will be automatically emailed to admin (<strong>wei91my@gmail.com</strong>).</p>
+                                <button id="generate-report-btn" type="button" style="background-color: #17a2b8;">Generate & Email Report</button>
+                                <span id="report-status" class="small-note"></span>
+                                <div id="report-progress" style="display:none; margin-top: 10px;">
+                                    <div style="background: #e9ecef; border-radius: 4px; height: 20px; overflow: hidden;">
+                                        <div id="report-progress-bar" style="background: #17a2b8; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                                    </div>
+                                    <p id="report-progress-text" style="font-size: 0.85rem; margin-top: 5px; color: #666;">Initializing...</p>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </section>
                     </div>
                 </div>
             </div>
@@ -709,6 +729,10 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jsPDF for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <!-- App Scripts -->
     <script src="js/config.js"></script>

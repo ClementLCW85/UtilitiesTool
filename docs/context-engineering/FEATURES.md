@@ -20,6 +20,7 @@
 |------------|-------------|-------|------------|--------|
 | **DASH-10** | Bill Details Pagination | UI | 1 | Done |
 | **ADM-8** | Dashboard Title Configuration | Admin | 1 | Pending |
+| **ADM-9** | PDF Report Generation | Admin | 2 | Done |
 
 ---
 
@@ -91,11 +92,48 @@ As an Admin, I want to customize the dashboard title, so it reflects the correct
 
 ---
 
+### ADM-9: PDF Report Generation
+**Owner:** Admin  
+**Complexity:** 2  
+**Priority:** Medium  
+**Status:** Done  
+
+**Description:**  
+Admin interface to generate a comprehensive PDF report containing all monthly bills, all units status, all payments by units with date/time, all collection rounds, and all unclaimed funds. Report includes generation date/time and is automatically emailed to admin email (wei91my@gmail.com).
+
+**User Story:**  
+As an Admin, I want to generate a comprehensive PDF report of all system data, so I can have a complete backup and overview emailed to me automatically.
+
+**Acceptance Criteria:**
+- [x] Button in Admin System settings to generate report.
+- [x] PDF includes: Executive Summary, Monthly Bills, Unit Status, Payment Records, Collection Rounds, Unclaimed Funds.
+- [x] Report includes generation date/time on every page.
+- [x] PDF is automatically emailed to admin email (wei91my@gmail.com).
+- [x] PDF is also downloaded locally for immediate access.
+- [x] Progress indicator shows report generation status.
+
+### Technical Scope
+**Affected Layers:** UI, Application, Infrastructure
+**Affected Files:** `js/app.js`, `index.html`, `css/style_v2.css`, `google-apps-script/Code.gs`
+**Dependencies:** ADM-3
+
+### Test Requirements
+- [x] Manual Check: PDF generates with all sections
+- [x] Manual Check: Email received with PDF attachment
+- [x] Manual Check: Report includes correct data from Firestore
+
+### Estimated Effort
+**Time:** 3 Hours
+**Risk Level:** Low
+
+---
+
 ## Dependencies Visualization
 
 ```mermaid
 graph TD
     INF-4 --> ADM-8
+    ADM-3 --> ADM-9
     DASH-9 --> DASH-10
 ```
 
@@ -107,11 +145,11 @@ graph TD
 | Team Member | Availability | Assigned Work | Remaining Capacity |
 |-------------|--------------|---------------|---------------------|
 | UI Dev | 100% | DASH-10 | High |
-| Admin Dev | 100% | ADM-8 | High |
+| Admin Dev | 100% | ADM-8, ADM-9 | Medium |
 
 ### Velocity Tracking
 **Previous Sprint Velocity:** 76 Points (SPR-01)  
-**Current Sprint Commitment:** 2 Points  
+**Current Sprint Commitment:** 4 Points  
 
 ---
 
@@ -121,3 +159,4 @@ graph TD
 |------------|-----------------|----------------|----------|---------|
 | DASH-10 | ✅ | - | - | - |
 | ADM-8 | ✅ | - | - | - |
+| ADM-9 | ✅ | - | - | - |

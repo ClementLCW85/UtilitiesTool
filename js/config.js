@@ -20,9 +20,9 @@ const googleConfig = {
     clientId: "182471854682-im86f1tue1ifo7brqujhtec7b2r7fgps.apps.googleusercontent.com", 
     // Scope for Drive API: 'https://www.googleapis.com/auth/drive.file' allows access only to files created by this app.
     scopes: "https://www.googleapis.com/auth/drive.file",
-    // Google Apps Script Proxy URL for Public No-Auth Uploads
+    // Google Apps Script Proxy URL for Public No-Auth Uploads and Email Service
     // Follow DEPLOY_INSTRUCTIONS.md to get this URL
-    scriptUrl: "https://script.google.com/macros/s/AKfycbxCd_0ohLuoqfNBpsXeWEk77SmYwKXPMlXzRRK5fmTDe05vQQWGZPInUN8j_-ur6WSpBg/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbwK7eIwVQfba-d2kXJVXPFc0JA9T-yu2w4qj_c46QSFrYE1HijxYAhg__vvNAMVuf97lg/exec",
     // Optional: ID of the folder where receipts should be stored
     // If empty, files will be saved in root
     folderId: "1VY6uns6MEDtAJoWQ7kUgZf7xa44b1M6n"

@@ -63,6 +63,7 @@
 | ADM-6 | Admin UI Segmentation | Reorganize Admin Dashboard into tabbed sections (Bills, Payments, Unclaimed, Units, System) to reduce scrolling. | Medium | INF-3 | Done |
 | ADM-7 | Theme Customization | Admin interface to select primary/secondary colors for the Public and Admin dashboards. | Low | INF-1 | Done |
 | ADM-8 | Dashboard Title Configuration | Admin interface to update the main title text displayed on the Public Dashboard. | Low | INF-1 | Pending |
+| **ADM-9** | **PDF Report Generation** | Admin can generate comprehensive PDF report with all bills, units, payments, collection rounds, and unclaimed funds. Auto-email to admin. | Medium | ADM-3 | Done |
 
 ## 6. Epic: Collection Rounds Management
 **Goal:** Manage and visualize specific fundraising rounds.

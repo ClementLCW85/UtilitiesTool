@@ -2404,3 +2404,361 @@ function bindThemeManagement() {
         });
     }
 }
+
+
+// ============================================
+// PDF Report Generation and Email (ADM-8)
+// ============================================
+
+function bindReportGeneration() {
+    const btn = document.getElementById('generate-report-btn');
+    const status = document.getElementById('report-status');
+    const progressDiv = document.getElementById('report-progress');
+    const progressBar = document.getElementById('report-progress-bar');
+    const progressText = document.getElementById('report-progress-text');
+    
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        status.textContent = '';
+        status.style.color = '';
+        progressDiv.style.display = 'block';
+        btn.disabled = true;
+        
+        try {
+            updateProgress(5, 'Fetching system stats...');
+            
+            // 1. Fetch all required data
+            const [
+                statsDoc,
+                billsSnapshot,
+                unitsSnapshot,
+                paymentsSnapshot,
+                roundsSnapshot,
+                unclaimedSnapshot
+            ] = await Promise.all([
+                window.db.collection('system').doc('stats').get(),
+                window.db.collection('bills').orderBy('issueDate', 'desc').get(),
+                window.db.collection('units').get(),
+                window.db.collection('payments').orderBy('date', 'desc').get(),
+                window.db.collection('collection_rounds').orderBy('startDate', 'desc').get(),
+                window.db.collection('unclaimed_records').orderBy('date', 'desc').get()
+            ]);
+            
+            updateProgress(20, 'Processing data...');
+            
+            // Process data
+            const stats = statsDoc.exists ? statsDoc.data() : { totalBillsAmount: 0, unitTarget: 0 };
+            
+            const bills = [];
+            billsSnapshot.forEach(doc => bills.push({ id: doc.id, ...doc.data() }));
+            
+            const units = [];
+            let totalCollected = 0;
+            unitsSnapshot.forEach(doc => {
+                const data = doc.data();
+                units.push(data);
+                totalCollected += (data.totalContributed || 0);
+            });
+            units.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
+            
+            const payments = [];
+            paymentsSnapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }));
+            
+            const rounds = [];
+            roundsSnapshot.forEach(doc => rounds.push({ id: doc.id, ...doc.data() }));
+            
+            const unclaimed = [];
+            let totalUnclaimed = 0;
+            unclaimedSnapshot.forEach(doc => {
+                const data = doc.data();
+                unclaimed.push(data);
+                totalUnclaimed += (data.amount || 0);
+            });
+            
+            updateProgress(40, 'Generating PDF...');
+            
+            // 2. Generate PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const generationDateTime = new Date().toLocaleString('en-MY', { 
+                dateStyle: 'full', 
+                timeStyle: 'medium' 
+            });
+            
+            // Header
+            doc.setFontSize(20);
+            doc.setTextColor(0, 120, 215);
+            doc.text('Seapark Apartment Block E', 105, 15, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('Utility Tracker - Comprehensive Report', 105, 25, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Report Generated: ${generationDateTime}`, 105, 35, { align: 'center' });
+            
+            let currentY = 45;
+            
+            // Executive Summary
+            doc.setFontSize(14);
+            doc.setTextColor(0);
+            doc.text('Executive Summary', 14, currentY);
+            currentY += 8;
+            
+            const summaryData = [
+                ['Total Bills to Date', formatCurrency(stats.totalBillsAmount || 0)],
+                ['Total Collected (Units)', formatCurrency(totalCollected)],
+                ['Total Unclaimed Funds', formatCurrency(totalUnclaimed)],
+                ['Grand Total Collected', formatCurrency(totalCollected + totalUnclaimed)],
+                ['Target Per Unit', formatCurrency(stats.isOverrideEnabled ? stats.overrideTarget : stats.unitTarget || 0)],
+                ['Number of Units', '44'],
+                ['Number of Monthly Bills', bills.length.toString()],
+                ['Number of Collection Rounds', rounds.length.toString()],
+                ['Number of Unclaimed Records', unclaimed.length.toString()]
+            ];
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Metric', 'Value']],
+                body: summaryData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 }
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 15;
+            
+            // Section 1: Monthly Bills
+            if (currentY > 250) { doc.addPage(); currentY = 20; }
+            doc.setFontSize(14);
+            doc.text('1. Monthly Bills', 14, currentY);
+            currentY += 8;
+            
+            const billsData = bills.map(b => [
+                `${getMonthName(b.month)} ${b.year}`,
+                formatCurrency(b.amount),
+                b.issueDate,
+                b.billUrl ? 'Yes' : 'No'
+            ]);
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Month/Year', 'Amount', 'Issue Date', 'Has Softcopy']],
+                body: billsData.length > 0 ? billsData : [['No bills recorded', '', '', '']],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 }
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 15;
+            
+            // Section 2: All Units
+            if (currentY > 250) { doc.addPage(); currentY = 20; }
+            doc.setFontSize(14);
+            doc.text('2. Unit Status Overview', 14, currentY);
+            currentY += 8;
+            
+            const unitsData = units.map(u => [
+                u.unitNumber,
+                formatCurrency(u.totalContributed || 0),
+                u.isHighlighted ? 'Yes' : 'No',
+                u.publicNote || '-'
+            ]);
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Unit', 'Total Contributed', 'Highlighted', 'Note']],
+                body: unitsData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 },
+                styles: { fontSize: 8 }
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 15;
+            
+            // Section 3: Payments by Units with DateTime
+            if (currentY > 250) { doc.addPage(); currentY = 20; }
+            doc.setFontSize(14);
+            doc.text('3. Payment Records', 14, currentY);
+            currentY += 8;
+            
+            // Group payments by unit
+            const paymentsByUnit = {};
+            payments.forEach(p => {
+                if (!paymentsByUnit[p.unitNumber]) paymentsByUnit[p.unitNumber] = [];
+                paymentsByUnit[p.unitNumber].push(p);
+            });
+            
+            // Create payment table data
+            let paymentTableData = [];
+            Object.keys(paymentsByUnit).sort().forEach(unitNum => {
+                const unitPayments = paymentsByUnit[unitNum];
+                unitPayments.forEach((p, idx) => {
+                    paymentTableData.push([
+                        idx === 0 ? unitNum : '',
+                        formatCurrency(p.amount),
+                        p.date,
+                        p.reference || '-',
+                        p.receiptUrl ? 'Yes' : 'No'
+                    ]);
+                });
+            });
+            
+            if (paymentTableData.length === 0) {
+                paymentTableData = [['No payments recorded', '', '', '', '']];
+            }
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Unit', 'Amount', 'Date', 'Reference', 'Has Receipt']],
+                body: paymentTableData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 },
+                styles: { fontSize: 7 },
+                pageBreak: 'auto'
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 15;
+            
+            // Section 4: Collection Rounds
+            if (currentY > 250 || rounds.length > 5) { doc.addPage(); currentY = 20; }
+            doc.setFontSize(14);
+            doc.text('4. Collection Rounds', 14, currentY);
+            currentY += 8;
+            
+            const roundsData = rounds.map(r => [
+                r.title,
+                formatCurrency(r.targetAmount),
+                r.startDate,
+                r.participatingUnitIds ? r.participatingUnitIds.length : 0,
+                r.remarks || '-'
+            ]);
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Title', 'Target', 'Start Date', 'Units', 'Remarks']],
+                body: roundsData.length > 0 ? roundsData : [['No collection rounds', '', '', '', '']],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 },
+                styles: { fontSize: 8 }
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 15;
+            
+            // Section 5: Unclaimed Funds
+            if (currentY > 250) { doc.addPage(); currentY = 20; }
+            doc.setFontSize(14);
+            doc.text('5. Unclaimed Funds', 14, currentY);
+            currentY += 8;
+            
+            const unclaimedData = unclaimed.map(u => [
+                u.date,
+                formatCurrency(u.amount),
+                u.remarks
+            ]);
+            
+            doc.autoTable({
+                startY: currentY,
+                head: [['Date Received', 'Amount', 'Remarks']],
+                body: unclaimedData.length > 0 ? unclaimedData : [['No unclaimed funds', '', '']],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 120, 215] },
+                margin: { left: 14, right: 14 }
+            });
+            
+            // Footer on each page
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text(`Page ${i} of ${pageCount} - Seapark Utility Tracker Report`, 105, 290, { align: 'center' });
+            }
+            
+            updateProgress(70, 'Preparing email...');
+            
+            // 3. Get PDF as base64
+            const pdfBase64 = doc.output('datauristring').split(',')[1];
+            
+            // 4. Send email via Google Apps Script
+            updateProgress(85, 'Sending email...');
+            
+            const emailData = {
+                action: 'sendEmail',
+                recipient: 'wei91my@gmail.com',
+                subject: `Seapark Utility Tracker - Comprehensive Report (${new Date().toLocaleDateString('en-MY')})`,
+                body: `Dear Admin,
+
+Please find attached the comprehensive report for Seapark Apartment Block E Utility Tracker.
+
+Report Generated: ${generationDateTime}
+
+Summary:
+- Total Bills: ${formatCurrency(stats.totalBillsAmount || 0)}
+- Total Collected: ${formatCurrency(totalCollected + totalUnclaimed)}
+- Number of Units: 44
+- Number of Bills: ${bills.length}
+- Number of Collection Rounds: ${rounds.length}
+- Number of Unclaimed Records: ${unclaimed.length}
+
+This is an automated report from the Seapark Utility Tracker system.
+
+Best regards,
+Seapark Utility Tracker`,
+                pdfData: pdfBase64,
+                pdfFilename: `seapark_report_${new Date().toISOString().slice(0,10)}.pdf`
+            };
+            
+            const response = await fetch(window.googleConfig.scriptUrl, {
+                method: 'POST',
+                body: JSON.stringify(emailData)
+            });
+            
+            const result = await response.json();
+            
+            updateProgress(100, 'Complete!');
+            
+            if (result.status === 'success') {
+                status.textContent = 'Report generated and emailed successfully!';
+                status.style.color = 'var(--success-color)';
+                
+                // Also offer download
+                doc.save(`seapark_report_${new Date().toISOString().slice(0,10)}.pdf`);
+            } else {
+                throw new Error(result.message || 'Failed to send email');
+            }
+            
+        } catch (error) {
+            console.error('Report generation error:', error);
+            status.textContent = 'Error: ' + error.message;
+            status.style.color = 'red';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Failed';
+        } finally {
+            btn.disabled = false;
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 5000);
+        }
+    });
+    
+    function updateProgress(percent, text) {
+        progressBar.style.width = percent + '%';
+        progressText.textContent = text;
+    }
+    
+    function getMonthName(monthNum) {
+        const months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+        return months[monthNum] || 'Unknown';
+    }
+}
+
+// Initialize report generation when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    bindReportGeneration();
+});

@@ -2,6 +2,14 @@ function doPost(e) {
   try {
     // 1. Get the data from the request
     var data = JSON.parse(e.postData.contents);
+    var action = data.action || 'upload'; // 'upload' or 'sendEmail'
+    
+    // Handle different actions
+    if (action === 'sendEmail') {
+      return handleSendEmail(data);
+    }
+    
+    // Default: file upload
     var filename = data.filename;
     var mimeType = data.mimeType;
     var base64Data = data.fileData;
@@ -58,5 +66,50 @@ function doPost(e) {
     var result = { status: "error", message: error.toString() };
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * Handle sending email with PDF attachment
+ */
+function handleSendEmail(data) {
+  try {
+    var recipient = data.recipient;
+    var subject = data.subject;
+    var body = data.body;
+    var pdfBase64 = data.pdfData;
+    var pdfFilename = data.pdfFilename || 'report.pdf';
+    
+    // Validation
+    if (!recipient || !subject || !pdfBase64) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: "Missing required fields: recipient, subject, or pdfData"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Create PDF blob from base64
+    var pdfBlob = Utilities.newBlob(
+      Utilities.base64Decode(pdfBase64),
+      'application/pdf',
+      pdfFilename
+    );
+    
+    // Send email with attachment
+    GmailApp.sendEmail(recipient, subject, body, {
+      attachments: [pdfBlob],
+      name: 'Seapark Utility Tracker'
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      message: "Email sent successfully to " + recipient
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 }
