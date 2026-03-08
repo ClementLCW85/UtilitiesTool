@@ -22,7 +22,7 @@ const googleConfig = {
     scopes: "https://www.googleapis.com/auth/drive.file",
     // Google Apps Script Proxy URL for Public No-Auth Uploads and Email Service
     // Follow DEPLOY_INSTRUCTIONS.md to get this URL
-    scriptUrl: "https://script.google.com/macros/s/AKfycbxjVFL6ylg07f1fPueNu8cKBMJOfkIBu0wcelqNP2MeLvzrg7s8BGQymbAHoXii1vC-wQ/exec",
+    scriptUrl: "***REMOVED***",
     // Optional: ID of the folder where receipts should be stored
     // If empty, files will be saved in root
     folderId: "***REMOVED***"
