@@ -1980,17 +1980,8 @@ async function loadLatestRound() {
         if (targetEl) targetEl.innerText = formatCurrency(round.targetAmount);
 
         // Determine Effective Start Date
+        // Always use the current round's start date to track payments for this round only
         let effectiveStartDate = round.startDate;
-        
-        if (snapshot.docs.length > 1) {
-             // If previous round exists, use its start date (accumulate from then)
-             effectiveStartDate = snapshot.docs[1].data().startDate || round.startDate;
-        } else {
-             // If ONLY 1 round (First ever round), default to 6 months prior to this round's start
-             const d = new Date(round.startDate);
-             d.setMonth(d.getMonth() - 6);
-             effectiveStartDate = d.toISOString().split('T')[0];
-        }
 
         const dateEl = document.getElementById('widget-round-start-date');
         if (dateEl) dateEl.innerText = effectiveStartDate;
@@ -1999,7 +1990,7 @@ async function loadLatestRound() {
         if (remarksEl) remarksEl.innerText = round.remarks || '';
 
         // Calculate Collected Amount
-        // Query payments from effectiveStartDate (Previous Round Start)
+        // Query payments from effectiveStartDate (Current Round Start)
         const paySnapshot = await window.db.collection('payments')
             .where('date', '>=', effectiveStartDate)
             .get();
