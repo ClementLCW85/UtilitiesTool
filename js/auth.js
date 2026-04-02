@@ -1,7 +1,7 @@
 // Authentication Logic
 const auth = {
-    // Admin Credential Configuration (Hardcoded Email for "Master Password" experience)
-    adminEmail: "***REMOVED***", // Virtual email for the single admin account
+    // Admin Credential Configuration (Read from injected config)
+    adminEmail: window.googleConfig ? window.googleConfig.adminEmail : "",
 
     init: function() {
         // Listen for auth state changes

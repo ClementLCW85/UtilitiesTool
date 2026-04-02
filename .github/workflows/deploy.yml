@@ -23,12 +23,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate config.js from template
+        env:
+          FB_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FB_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FB_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FB_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FB_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FB_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FB_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
+          GOOGLE_FOLDER_ID: ${{ secrets.GOOGLE_FOLDER_ID }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        run: |
+          cp js/config.template.js js/config.js
+          sed -i "s|__FIREBASE_API_KEY__|$FB_API_KEY|g" js/config.js
+          sed -i "s|__FIREBASE_AUTH_DOMAIN__|$FB_AUTH_DOMAIN|g" js/config.js
+          sed -i "s|__FIREBASE_PROJECT_ID__|$FB_PROJECT_ID|g" js/config.js
+          sed -i "s|__FIREBASE_STORAGE_BUCKET__|$FB_STORAGE_BUCKET|g" js/config.js
+          sed -i "s|__FIREBASE_MESSAGING_SENDER_ID__|$FB_MESSAGING_SENDER_ID|g" js/config.js
+          sed -i "s|__FIREBASE_APP_ID__|$FB_APP_ID|g" js/config.js
+          sed -i "s|__FIREBASE_MEASUREMENT_ID__|$FB_MEASUREMENT_ID|g" js/config.js
+          sed -i "s|__GOOGLE_CLIENT_ID__|$GOOGLE_CLIENT_ID|g" js/config.js
+          sed -i "s|__GOOGLE_SCRIPT_URL__|$GOOGLE_SCRIPT_URL|g" js/config.js
+          sed -i "s|__GOOGLE_FOLDER_ID__|$GOOGLE_FOLDER_ID|g" js/config.js
+          sed -i "s|__ADMIN_EMAIL__|$ADMIN_EMAIL|g" js/config.js
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

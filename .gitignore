@@ -1,3 +1,7 @@
 .vs/
 *.log
 *.tmp
+
+# Local generated config files (contain secrets)
+js/config.js
+google-apps-script/Code.gs
